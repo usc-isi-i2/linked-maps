@@ -1,0 +1,3 @@
+ select st_astext(st_intersection(a.geom, st_intersection(st_buffer(a.geom, 0.001), st_buffer(b.geom, 0.001)))) from test_line as a join altered as b on st_intersects(a.geom, b.geom);
+
+ select st_asText(st_intersection(st_buffer(a.geom, 0.0001), st_buffer(b.geom, 0.0001))) from test_line as a join altered as b on st_intersects(a.geom, b.geom);
