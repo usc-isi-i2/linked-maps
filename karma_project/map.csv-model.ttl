@@ -1,0 +1,194 @@
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ns1: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <http://schema.org/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix km-dev: <http://isi.edu/integration/karma/dev#> .
+
+_:node1catpespdx1 a km-dev:R2RMLMapping ;
+	km-dev:sourceName "map.csv" ;
+	km-dev:modelPublicationTime "1523565687597"^^xsd:long ;
+	km-dev:modelVersion "1.7" ;
+	km-dev:hasInputColumns "[[{\"columnName\":\"mapid\"}],[{\"columnName\":\"year\"}]]" ;
+	km-dev:hasOutputColumns "[[{\"columnName\":\"mapid\"}],[{\"columnName\":\"year\"}]]" ;
+	km-dev:hasModelLabel "map.csv" ;
+	km-dev:hasBaseURI "http://localhost:8080/source/" ;
+	km-dev:hasWorksheetHistory """[
+    {
+        \"commandName\": \"SetMetaPropertyCommand\",
+        \"model\": \"new\",
+        \"inputParameters\": [
+            {
+                \"name\": \"hNodeId\",
+                \"type\": \"hNodeId\",
+                \"value\": [{\"columnName\": \"mapid\"}]
+            },
+            {
+                \"name\": \"worksheetId\",
+                \"type\": \"worksheetId\",
+                \"value\": \"W\"
+            },
+            {
+                \"name\": \"selectionName\",
+                \"type\": \"other\",
+                \"value\": \"DEFAULT_TEST\"
+            },
+            {
+                \"name\": \"metaPropertyName\",
+                \"type\": \"other\",
+                \"value\": \"isUriOfClass\"
+            },
+            {
+                \"name\": \"metaPropertyUri\",
+                \"type\": \"other\",
+                \"value\": \"http://schema.org/MapCategoryType\"
+            },
+            {
+                \"name\": \"metaPropertyId\",
+                \"type\": \"other\",
+                \"value\": \"http://schema.org/MapCategoryType1\"
+            },
+            {
+                \"name\": \"SemanticTypesArray\",
+                \"type\": \"other\",
+                \"value\": [{
+                    \"DomainUri\": \"http://schema.org/MapCategoryType\",
+                    \"DomainId\": \"http://schema.org/MapCategoryType1\",
+                    \"isPrimary\": true,
+                    \"isProvenance\": false,
+                    \"FullType\": \"http://isi.edu/integration/karma/dev#classLink\",
+                    \"DomainLabel\": \"schema:MapCategoryType1 (add)\"
+                }]
+            },
+            {
+                \"name\": \"trainAndShowUpdates\",
+                \"type\": \"other\",
+                \"value\": true
+            },
+            {
+                \"name\": \"rdfLiteralType\",
+                \"type\": \"other\",
+                \"value\": \"\"
+            },
+            {
+                \"name\": \"language\",
+                \"type\": \"other\",
+                \"value\": \"\"
+            },
+            {
+                \"name\": \"inputColumns\",
+                \"type\": \"hNodeIdList\",
+                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"mapid\\\"}]}]\"
+            },
+            {
+                \"name\": \"outputColumns\",
+                \"type\": \"hNodeIdList\",
+                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"mapid\\\"}]}]\"
+            }
+        ],
+        \"tags\": [\"SemanticType\"]
+    },
+    {
+        \"commandName\": \"SetSemanticTypeCommand\",
+        \"model\": \"new\",
+        \"inputParameters\": [
+            {
+                \"name\": \"hNodeId\",
+                \"type\": \"hNodeId\",
+                \"value\": [{\"columnName\": \"year\"}]
+            },
+            {
+                \"name\": \"worksheetId\",
+                \"type\": \"worksheetId\",
+                \"value\": \"W\"
+            },
+            {
+                \"name\": \"selectionName\",
+                \"type\": \"other\",
+                \"value\": \"DEFAULT_TEST\"
+            },
+            {
+                \"name\": \"SemanticTypesArray\",
+                \"type\": \"other\",
+                \"value\": [{
+                    \"DomainUri\": \"http://schema.org/MapCategoryType\",
+                    \"DomainId\": \"http://schema.org/MapCategoryType1\",
+                    \"isPrimary\": true,
+                    \"isProvenance\": false,
+                    \"FullType\": \"http://schema.org/releaseDate\",
+                    \"DomainLabel\": \"schema:MapCategoryType1\"
+                }]
+            },
+            {
+                \"name\": \"trainAndShowUpdates\",
+                \"type\": \"other\",
+                \"value\": true
+            },
+            {
+                \"name\": \"rdfLiteralType\",
+                \"type\": \"other\",
+                \"value\": \"\"
+            },
+            {
+                \"name\": \"language\",
+                \"type\": \"other\",
+                \"value\": \"\"
+            },
+            {
+                \"name\": \"inputColumns\",
+                \"type\": \"hNodeIdList\",
+                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"year\\\"}]}]\"
+            },
+            {
+                \"name\": \"outputColumns\",
+                \"type\": \"hNodeIdList\",
+                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"year\\\"}]}]\"
+            }
+        ],
+        \"tags\": [\"SemanticType\"]
+    }
+]""" .
+
+km-dev:TriplesMap_c7dfe9a6-f842-46fe-aa03-10933ce62d81 a rr:TriplesMap .
+
+_:node1catpespdx1 km-dev:hasTriplesMap km-dev:TriplesMap_c7dfe9a6-f842-46fe-aa03-10933ce62d81 .
+
+km-dev:TriplesMap_c7dfe9a6-f842-46fe-aa03-10933ce62d81 km-dev:isPartOfMapping _:node1catpespdx1 .
+
+_:node1catpespdx2 rr:tableName "map.csv" ;
+	a rr:LogicalTable ;
+	km-dev:isPartOfMapping _:node1catpespdx1 .
+
+_:node1catpespdx1 km-dev:hasLogicalTable _:node1catpespdx2 .
+
+km-dev:TriplesMap_c7dfe9a6-f842-46fe-aa03-10933ce62d81 rr:logicalTable _:node1catpespdx2 ;
+	rr:subjectMap _:node1catpespdx3 .
+
+_:node1catpespdx1 km-dev:hasSubjectMap _:node1catpespdx3 .
+
+_:node1catpespdx3 km-dev:isPartOfMapping _:node1catpespdx1 ;
+	a rr:SubjectMap ;
+	km-dev:alignmentNodeId "http://schema.org/MapCategoryType1" ;
+	rr:class schema:MapCategoryType ;
+	rr:template "{mapid}" ;
+	a km-dev:steinerTreeRootNode .
+
+km-dev:PredicateObjectMap_930e735b-8ab2-49bf-b2ff-5d1dc98119ad rr:predicate schema:releaseDate .
+
+_:node1catpespdx4 rr:column "year" ;
+	a rr:ObjectMap ;
+	km-dev:isPartOfMapping _:node1catpespdx1 .
+
+_:node1catpespdx1 km-dev:hasObjectMap _:node1catpespdx4 .
+
+km-dev:PredicateObjectMap_930e735b-8ab2-49bf-b2ff-5d1dc98119ad rr:objectMap _:node1catpespdx4 .
+
+km-dev:TriplesMap_c7dfe9a6-f842-46fe-aa03-10933ce62d81 rr:predicateObjectMap km-dev:PredicateObjectMap_930e735b-8ab2-49bf-b2ff-5d1dc98119ad .
+
+km-dev:PredicateObjectMap_930e735b-8ab2-49bf-b2ff-5d1dc98119ad a rr:PredicateObjectMap ;
+	km-dev:isPartOfMapping _:node1catpespdx1 .
+
+_:node1catpespdx1 km-dev:hasPredicateObjectMap km-dev:PredicateObjectMap_930e735b-8ab2-49bf-b2ff-5d1dc98119ad .
