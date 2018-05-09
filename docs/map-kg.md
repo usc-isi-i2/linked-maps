@@ -105,7 +105,7 @@ After modeling in Karma, we can generate ttl files based on our model, just load
 
 ## Queries
 
-### vectors in 2003 and not in 2005
+### Vectors in 2003 and not in 2005
 
     PREFIX schema: <http://schema.org/>
     select distinct ?a ?mapa
@@ -123,7 +123,7 @@ After modeling in Karma, we can generate ttl files based on our model, just load
         }
     }
 
-### vectors in 2003 and 2005
+### Vectors in 2003 and 2005
 
     PREFIX schema: <http://schema.org/>
     select distinct ?a
