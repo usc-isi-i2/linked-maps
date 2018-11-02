@@ -23,3 +23,11 @@ Then move the file to the directory `apache-jena-fuseki-X.X.X/run/configuration`
 ```
 java -cp "fuseki-server.jar:lib/jts-1.14.jar" org.apache.jena.fuseki.cmd.FusekiCmd -debug
 ```
+
+5. Open your browser and enter `http://localhost:3030/`
+
+6. Manage datasets -> add new dataset -> create dataset
+
+7. Select "upload data" on the dataset you created, and upload the RDF files
+
+8. Now you can run SPARQL queries under "dataset" section.
