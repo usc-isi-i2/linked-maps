@@ -22,6 +22,9 @@ Then move the file to the directory `apache-jena-fuseki-X.X.X/run/configuration`
 4. Run the following command to start Jena Fuseki:
 ```
 java -cp "fuseki-server.jar:lib/jts-1.14.jar" org.apache.jena.fuseki.cmd.FusekiCmd -debug
+For Windows:
+java -cp ".\fuseki-server.jar;lib\jts-1.14.jar" org.apache.jena.fuseki.cmd.FusekiCmd
+
 ```
 5. Open your browser and enter `http://localhost:3030/`
 6. Manage datasets -> add new dataset -> create dataset
