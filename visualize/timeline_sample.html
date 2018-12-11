@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <!-- OL3 JS -->
+    <link rel="stylesheet" href="https://openlayers.org/en/v5.3.0/css/ol.css" type="text/css">
+    <style>
+        .map {
+            height: 400px;
+            width: 100%;
+        }
+        #custom-handle {
+            width: 3em;
+            height: 1.6em;
+            top: 50%;
+            margin-top: -.8em;
+            text-align: center;
+            line-height: 1.6em;
+        }
+        #slider  {
+            height: 15px;
+            width: 300px;
+            padding-left: 5px;
+        }
+    </style>
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+</head>
+<script>
+    var tl;
+    var years = [];
+    var map;
+    var activeLayer = null;
+    $.getJSON("Trans_RailFeature_clip_proj.json", function (json) {
+        ralis = json;
+        mapInit(ralis);
+        sliderInit();
+    });
+    function mapInit(rails) {
+        var raster = new ol.layer.Tile({
+            source: new ol.source.OSM(),
+            opacity: 0.3
+        });
+
+        map = new ol.Map({
+            layers: [raster],
+            target: 'map',
+            view: new ol.View({
+                center: [0, 0],
+                zoom: 2
+            })
+        });
+
+        for (var i = 0; i < rails.length; i++) {
+            var railFeatures = rails[i]["wkt"];
+            years.push(Number(rails[i]["year"]));
+
+            features = [];
+            for (var j = 0; j < railFeatures.length; j++) {
+                var wkt = railFeatures[j];
+                var format = new ol.format.WKT();
+                var feature = format.readFeature(wkt, {
+                    dataProjection: 'EPSG:4326',
+                    featureProjection: 'EPSG:3857'
+                });
+                features.push(feature);
+            }
+            // set all vector layers invisible by default
+            var vector = new ol.layer.Vector({
+                source: new ol.source.Vector({
+                    features: features
+                }),
+                name: rails[i]["year"],
+                visible: false
+            });
+
+            map.addLayer(vector);
+        }
+
+        // set initial viewpoint as vector layer location
+        var extent = vector.getSource().getExtent();
+        map.getView().fit(extent, map.getSize());
+
+        // sort years for slider to use
+        years.sort();
+
+        // set 1st vector layer visible
+        var layers = map.getLayers();
+        for (var i = 0; i < layers.getLength(); i++) {
+            if (years[0].toString() === layers.item(i).get('name')) {
+                layers.item(i).set('visible', true);
+                activeLayer = layers.item(i);
+                break;
+            }
+        }
+    }
+
+    function sliderInit() {
+        var handle = $("#custom-handle");
+        $("#slider").slider({
+            // min and max are indexes, actual year value is years[ui.value]
+            min: 0,
+            max: years.length - 1,
+            value: 0,
+            create: function (event, ui) {
+                handle.text(years[0]);
+            },
+            slide: function (event, ui) {
+                handle.text(years[ui.value]);
+                var year = years[ui.value];
+                var layers = map.getLayers();
+                var layer;
+                // linear search for target layer
+                for (var i = 0; i < layers.getLength(); i++) {
+                    if (year.toString() === layers.item(i).get('name')) {
+                        layer = layers.item(i);
+                        break;
+                    }
+                }
+                // set previous layer invisible
+                if (activeLayer != null) {
+                    activeLayer.set('visible', false);
+                }
+                layer.set('visible', true);
+                activeLayer = layer;
+            }
+        });
+    }
+</script>
+
+<body>
+    <div id="map" class="smallmap"></div>
+    <br />
+    <div id="slider">
+        <div id="custom-handle" class="ui-slider-handle"></div>
+    </div>
+</body>
+
+</html>
