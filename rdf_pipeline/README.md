@@ -20,7 +20,8 @@ spatial:directory <file:/YOURPATH/apache-jena-fuseki-X.X.X/run/databases/spatial
 For example (Windows)
 ```
 <#dataset> rdf:type      tdb:DatasetTDB ;
-    tdb:location "C:\\apache-jena-fuseki-3.9.0\\run\\databases\\spatial_data"    
+    tdb:location "C:/apache-jena-fuseki-3.9.0/run/databases/spatial_data"  
+    
 spatial:directory <file:../databases/spatial_data/spatial> ;
 ```
 
