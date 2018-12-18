@@ -8,7 +8,7 @@ For Windows
 # Model the data from DB (Batch Mode)
 For Windows
 1) Download Karma Source and follow the installation instruction from https://github.com/usc-isi-i2/Web-Karma/wiki/Installation%3A-Source-Code 
-2) Navigate to ```\Web-Karma-master\karma-offline``` and run ``` mvn install -P shaded````
+2) Navigate to ```\Web-Karma-master\karma-offline``` and run ``` mvn install -P shaded```
 3) Navigate to target folder  ```\Web-Karma-master\karma-offline\target.``` 
 4) Download PostgreSQL JDBC driver https://jdbc.postgresql.org/download.html and place it in the target folder.  
 5) Download public.maps-model.ttl and place it in the target folder
