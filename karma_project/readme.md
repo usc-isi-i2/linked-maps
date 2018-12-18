@@ -11,6 +11,6 @@ For Windows
 2) Follow this instruction for offline RDF generator https://github.com/usc-isi-i2/Web-Karma/wiki/Batch-Mode-for-RDF-Generation#offlinerdfgenerator
 Navigate to Web-Karma-master\karma-offline\target and run this command
 For Windows
-'''
+```
 java -cp "postgresql-42.2.5.jre7.jar;karma-offline-0.0.1-SNAPSHOT-shaded.jar" edu.isi.karma.rdf.OfflineRdfGenerator --sourcetype DB --dbtype PostGIS --hostname localhost --username postgres --password admin --portnumber 5432 --dbname test_line_segment_2 --tablename maps --modelfilepath public.maps-model.ttl --outputfile out.ttl
-'''
+```
