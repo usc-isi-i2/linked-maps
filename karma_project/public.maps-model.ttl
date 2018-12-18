@@ -1,0 +1,318 @@
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix karma: <http://isi.edu/integration/karma/ontologies/model/current#> .
+@prefix ns1: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <http://schema.org/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix km-dev: <http://isi.edu/integration/karma/dev#> .
+
+_:node1cv1o3gkdx1 a km-dev:R2RMLMapping ;
+	km-dev:sourceName "public.maps" ;
+	km-dev:modelPublicationTime "1545173320334"^^xsd:long ;
+	km-dev:modelVersion "1.7" ;
+	km-dev:hasInputColumns "[[{\"columnName\":\"line_name\"}],[{\"columnName\":\"wkt\"}]]" ;
+	km-dev:hasOutputColumns "[[{\"columnName\":\"line_name\"}],[{\"columnName\":\"URI\"}]]" ;
+	km-dev:hasModelLabel "public.maps" ;
+	km-dev:hasBaseURI "http://localhost:8080/source/" ;
+	km-dev:hasWorksheetHistory """[
+    {
+        \"commandName\": \"SubmitPythonTransformationCommand\",
+        \"model\": \"new\",
+        \"inputParameters\": [
+            {
+                \"name\": \"hNodeId\",
+                \"type\": \"hNodeId\",
+                \"value\": [{\"columnName\": \"wkt\"}]
+            },
+            {
+                \"name\": \"worksheetId\",
+                \"type\": \"worksheetId\",
+                \"value\": \"W\"
+            },
+            {
+                \"name\": \"selectionName\",
+                \"type\": \"other\",
+                \"value\": \"DEFAULT_TEST\"
+            },
+            {
+                \"name\": \"newColumnName\",
+                \"type\": \"other\",
+                \"value\": \"URI\"
+            },
+            {
+                \"name\": \"transformationCode\",
+                \"type\": \"other\",
+                \"value\": \"from zlib import crc32\\r\\nwkt = getValue('wkt')\\r\\nreturn hex(crc32(wkt))[2:]\"
+            },
+            {
+                \"name\": \"errorDefaultValue\",
+                \"type\": \"other\",
+                \"value\": \"\"
+            },
+            {
+                \"name\": \"isJSONOutput\",
+                \"type\": \"other\",
+                \"value\": \"false\"
+            },
+            {
+                \"name\": \"inputColumns\",
+                \"type\": \"hNodeIdList\",
+                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"wkt\\\"}]}]\"
+            },
+            {
+                \"name\": \"outputColumns\",
+                \"type\": \"hNodeIdList\",
+                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"URI\\\"}]}]\"
+            }
+        ],
+        \"tags\": [\"Transformation\"]
+    },
+    {
+        \"commandName\": \"SetMetaPropertyCommand\",
+        \"model\": \"new\",
+        \"inputParameters\": [
+            {
+                \"name\": \"hNodeId\",
+                \"type\": \"hNodeId\",
+                \"value\": [{\"columnName\": \"URI\"}]
+            },
+            {
+                \"name\": \"worksheetId\",
+                \"type\": \"worksheetId\",
+                \"value\": \"W\"
+            },
+            {
+                \"name\": \"selectionName\",
+                \"type\": \"other\",
+                \"value\": \"DEFAULT_TEST\"
+            },
+            {
+                \"name\": \"metaPropertyName\",
+                \"type\": \"other\",
+                \"value\": \"isUriOfClass\"
+            },
+            {
+                \"name\": \"metaPropertyUri\",
+                \"type\": \"other\",
+                \"value\": \"http://schema.org/Map\"
+            },
+            {
+                \"name\": \"metaPropertyId\",
+                \"type\": \"other\",
+                \"value\": \"http://schema.org/Map1\"
+            },
+            {
+                \"name\": \"SemanticTypesArray\",
+                \"type\": \"other\",
+                \"value\": [{
+                    \"DomainUri\": \"http://schema.org/Map\",
+                    \"DomainId\": \"http://schema.org/Map1\",
+                    \"isPrimary\": true,
+                    \"isProvenance\": false,
+                    \"FullType\": \"http://isi.edu/integration/karma/dev#classLink\",
+                    \"DomainLabel\": \"schema:Map1 (add)\"
+                }]
+            },
+            {
+                \"name\": \"trainAndShowUpdates\",
+                \"type\": \"other\",
+                \"value\": true
+            },
+            {
+                \"name\": \"rdfLiteralType\",
+                \"type\": \"other\",
+                \"value\": \"\"
+            },
+            {
+                \"name\": \"language\",
+                \"type\": \"other\",
+                \"value\": \"\"
+            },
+            {
+                \"name\": \"inputColumns\",
+                \"type\": \"hNodeIdList\",
+                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"URI\\\"}]}]\"
+            },
+            {
+                \"name\": \"outputColumns\",
+                \"type\": \"hNodeIdList\",
+                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"URI\\\"}]}]\"
+            }
+        ],
+        \"tags\": [\"SemanticType\"]
+    },
+    {
+        \"commandName\": \"SetMetaPropertyCommand\",
+        \"model\": \"new\",
+        \"inputParameters\": [
+            {
+                \"name\": \"hNodeId\",
+                \"type\": \"hNodeId\",
+                \"value\": [{\"columnName\": \"line_name\"}]
+            },
+            {
+                \"name\": \"worksheetId\",
+                \"type\": \"worksheetId\",
+                \"value\": \"W\"
+            },
+            {
+                \"name\": \"selectionName\",
+                \"type\": \"other\",
+                \"value\": \"DEFAULT_TEST\"
+            },
+            {
+                \"name\": \"metaPropertyName\",
+                \"type\": \"other\",
+                \"value\": \"isUriOfClass\"
+            },
+            {
+                \"name\": \"metaPropertyUri\",
+                \"type\": \"other\",
+                \"value\": \"http://schema.org/MapCategoryType\"
+            },
+            {
+                \"name\": \"metaPropertyId\",
+                \"type\": \"other\",
+                \"value\": \"http://schema.org/MapCategoryType1\"
+            },
+            {
+                \"name\": \"SemanticTypesArray\",
+                \"type\": \"other\",
+                \"value\": [{
+                    \"DomainUri\": \"http://schema.org/MapCategoryType\",
+                    \"DomainId\": \"http://schema.org/MapCategoryType1\",
+                    \"isPrimary\": true,
+                    \"isProvenance\": false,
+                    \"FullType\": \"http://isi.edu/integration/karma/dev#classLink\",
+                    \"DomainLabel\": \"schema:MapCategoryType1 (add)\"
+                }]
+            },
+            {
+                \"name\": \"trainAndShowUpdates\",
+                \"type\": \"other\",
+                \"value\": true
+            },
+            {
+                \"name\": \"rdfLiteralType\",
+                \"type\": \"other\",
+                \"value\": \"\"
+            },
+            {
+                \"name\": \"language\",
+                \"type\": \"other\",
+                \"value\": \"\"
+            },
+            {
+                \"name\": \"inputColumns\",
+                \"type\": \"hNodeIdList\",
+                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"line_name\\\"}]}]\"
+            },
+            {
+                \"name\": \"outputColumns\",
+                \"type\": \"hNodeIdList\",
+                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"line_name\\\"}]}]\"
+            }
+        ],
+        \"tags\": [\"SemanticType\"]
+    },
+    {
+        \"commandName\": \"AddLinkCommand\",
+        \"model\": \"new\",
+        \"inputParameters\": [
+            {
+                \"name\": \"worksheetId\",
+                \"type\": \"worksheetId\",
+                \"value\": \"W\"
+            },
+            {
+                \"name\": \"edge\",
+                \"type\": \"other\",
+                \"value\": {
+                    \"edgeTargetId\": \"http://schema.org/MapCategoryType1\",
+                    \"edgeId\": \"http://schema.org/mapType\",
+                    \"edgeTargetUri\": \"http://schema.org/MapCategoryType\",
+                    \"edgeSourceId\": \"http://schema.org/Map1\",
+                    \"edgeSourceUri\": \"http://schema.org/Map\"
+                }
+            },
+            {
+                \"name\": \"inputColumns\",
+                \"type\": \"hNodeIdList\",
+                \"value\": \"[]\"
+            },
+            {
+                \"name\": \"outputColumns\",
+                \"type\": \"hNodeIdList\",
+                \"value\": \"[]\"
+            }
+        ],
+        \"tags\": [\"Modeling\"]
+    }
+]""" .
+
+km-dev:TriplesMap_bc329d54-661f-4d81-a48f-eae3d1ba7d6f a rr:TriplesMap .
+
+_:node1cv1o3gkdx1 km-dev:hasTriplesMap km-dev:TriplesMap_bc329d54-661f-4d81-a48f-eae3d1ba7d6f .
+
+km-dev:TriplesMap_bc329d54-661f-4d81-a48f-eae3d1ba7d6f km-dev:isPartOfMapping _:node1cv1o3gkdx1 .
+
+_:node1cv1o3gkdx2 rr:tableName "public.maps" ;
+	a rr:LogicalTable ;
+	km-dev:isPartOfMapping _:node1cv1o3gkdx1 .
+
+_:node1cv1o3gkdx1 km-dev:hasLogicalTable _:node1cv1o3gkdx2 .
+
+km-dev:TriplesMap_bc329d54-661f-4d81-a48f-eae3d1ba7d6f rr:logicalTable _:node1cv1o3gkdx2 ;
+	rr:subjectMap _:node1cv1o3gkdx3 .
+
+_:node1cv1o3gkdx1 km-dev:hasSubjectMap _:node1cv1o3gkdx3 .
+
+_:node1cv1o3gkdx3 km-dev:isPartOfMapping _:node1cv1o3gkdx1 ;
+	a rr:SubjectMap ;
+	km-dev:alignmentNodeId "http://schema.org/Map1" ;
+	rr:class schema:Map ;
+	rr:template "{URI}" ;
+	a km-dev:steinerTreeRootNode .
+
+km-dev:PredicateObjectMap_67eea441-9289-4f71-afbe-87bd24359a5e rr:predicate schema:mapType .
+
+km-dev:RefObjectMap_e780a8ea-7bc1-4bfb-bf9a-25bbeb380401 a rr:RefObjectMap , rr:ObjectMap ;
+	rr:parentTriplesMap km-dev:TriplesMap_20d026d3-5ff1-4ec7-8282-05d8d8f049a5 ;
+	km-dev:isPartOfMapping _:node1cv1o3gkdx1 .
+
+_:node1cv1o3gkdx1 km-dev:hasObjectMap km-dev:RefObjectMap_e780a8ea-7bc1-4bfb-bf9a-25bbeb380401 .
+
+km-dev:PredicateObjectMap_67eea441-9289-4f71-afbe-87bd24359a5e rr:objectMap km-dev:RefObjectMap_e780a8ea-7bc1-4bfb-bf9a-25bbeb380401 .
+
+km-dev:TriplesMap_bc329d54-661f-4d81-a48f-eae3d1ba7d6f rr:predicateObjectMap km-dev:PredicateObjectMap_67eea441-9289-4f71-afbe-87bd24359a5e .
+
+km-dev:PredicateObjectMap_67eea441-9289-4f71-afbe-87bd24359a5e a rr:PredicateObjectMap ;
+	km-dev:isPartOfMapping _:node1cv1o3gkdx1 .
+
+_:node1cv1o3gkdx1 km-dev:hasPredicateObjectMap km-dev:PredicateObjectMap_67eea441-9289-4f71-afbe-87bd24359a5e .
+
+km-dev:TriplesMap_20d026d3-5ff1-4ec7-8282-05d8d8f049a5 a rr:TriplesMap .
+
+_:node1cv1o3gkdx1 km-dev:hasTriplesMap km-dev:TriplesMap_20d026d3-5ff1-4ec7-8282-05d8d8f049a5 .
+
+km-dev:TriplesMap_20d026d3-5ff1-4ec7-8282-05d8d8f049a5 km-dev:isPartOfMapping _:node1cv1o3gkdx1 .
+
+_:node1cv1o3gkdx4 rr:tableName "public.maps" ;
+	a rr:LogicalTable ;
+	km-dev:isPartOfMapping _:node1cv1o3gkdx1 .
+
+_:node1cv1o3gkdx1 km-dev:hasLogicalTable _:node1cv1o3gkdx4 .
+
+km-dev:TriplesMap_20d026d3-5ff1-4ec7-8282-05d8d8f049a5 rr:logicalTable _:node1cv1o3gkdx4 ;
+	rr:subjectMap _:node1cv1o3gkdx5 .
+
+_:node1cv1o3gkdx1 km-dev:hasSubjectMap _:node1cv1o3gkdx5 .
+
+_:node1cv1o3gkdx5 km-dev:isPartOfMapping _:node1cv1o3gkdx1 ;
+	a rr:SubjectMap ;
+	km-dev:alignmentNodeId "http://schema.org/MapCategoryType1" ;
+	rr:class schema:MapCategoryType ;
+	rr:template "{line_name}" .
