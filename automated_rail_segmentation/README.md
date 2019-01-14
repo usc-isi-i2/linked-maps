@@ -55,3 +55,13 @@ TODO (1/14/2019):
 The program shall read the config file directly and should be called as follows;
 
 ```python main.py <path/to/shapefile/> <path/to/configure/file```
+
+TODO (1/14/2019):
+
+Right now program does not create table wkt. We do it manually using this query.
+
+```
+update maps set wkt = st_astext(sub.geom)
+from(select gid, geom from maps) as sub
+where sub.gid = maps.gid
+```
