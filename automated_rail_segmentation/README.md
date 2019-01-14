@@ -24,3 +24,14 @@ For row in leaf_nodes (linked FK):
     insert_row_to_this_table(this_geom ∩ new_map_geom)
     insert_row_to_this(new_map_geom - all existing_map)
 ```
+
+How to run main.py?
+
+```python main.py <path/to/shapefile/>```
+
+In our experiment, we use three maps in Bray, CA in 1950, 1988 and 2001. You will need to install PostgreSQL and Postgis and update the configuration at the top of main.py.
+
+TODO (1/14/2019):
+
+The program shall read the config file directly and should be called as follows;
+```python main.py <path/to/shapefile/> <path/to/configure/file```
