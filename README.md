@@ -1,3 +1,7 @@
 # Linked Maps Project
 
-- [RDF Pipeline](https://github.com/usc-isi-i2/linked-maps/tree/master/rdf_pipeline): steps on setting up Karma and Apache Jena for generating and querying geospatial RDFs
+The process can be separated into three steps.
+
+1. Automated Line Segmentation using PostgreSQL and Postgis (Python)
+2. Model data in RDF using Karma
+3. Perfrom query using SPARQL on Apache Jena
