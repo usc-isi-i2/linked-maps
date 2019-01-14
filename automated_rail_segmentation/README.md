@@ -1,3 +1,7 @@
+# Automated Line Segmentation
+
+The idea of line segmentation shall be described as follows. You can read [this paper](http://usc-isi-i2.github.io/papers/lin18.pdf) for more info.
+
 ```
     A   B
    / \ / \
@@ -25,7 +29,9 @@ For row in leaf_nodes (linked FK):
     insert_row_to_this(new_map_geom - all existing_map)
 ```
 
-How to run main.py?
+## main.py
+
+The program shall be called as follows.
 
 ```python main.py <path/to/shapefile/>```
 
