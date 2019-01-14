@@ -58,7 +58,7 @@ The program shall read the config file directly and should be called as follows;
 
 TODO (1/14/2019):
 
-Right now program does not create table wkt. We do it manually using this query.
+Right now program does not create wkt column. We do it manually using this query.
 
 ```
 update maps set wkt = st_astext(sub.geom)
