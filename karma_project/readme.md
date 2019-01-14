@@ -17,3 +17,5 @@ For Windows
 ```
 java -cp "postgresql-42.2.5.jre7.jar;karma-offline-0.0.1-SNAPSHOT-shaded.jar" edu.isi.karma.rdf.OfflineRdfGenerator --sourcetype DB --dbtype PostGIS --hostname localhost --username <your_user_name> --password <your_password> --portnumber 5432 --dbname <your_db_name> --tablename maps --modelfilepath public.maps-model.ttl --outputfile out.ttl
 ```
+
+Once you have already set up, the next time you just navigate to ```\Web-Karma-master\karma-offline\target.``` , and do step 5) and 6).
