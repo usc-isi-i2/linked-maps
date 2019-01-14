@@ -29,7 +29,7 @@ For row in leaf_nodes (linked FK):
     insert_row_to_this(new_map_geom - all existing_map)
 ```
 
-## main.py
+**main.py**
 
 The program shall be called as follows.
 
@@ -40,4 +40,5 @@ In our experiment, we use three maps in Bray, CA in 1950, 1988 and 2001. You wil
 TODO (1/14/2019):
 
 The program shall read the config file directly and should be called as follows;
+
 ```python main.py <path/to/shapefile/> <path/to/configure/file```
