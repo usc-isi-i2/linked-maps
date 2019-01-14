@@ -37,6 +37,19 @@ The program shall be called as follows.
 
 In our experiment, we use three maps in Bray, CA in 1950, 1988 and 2001. You will need to install PostgreSQL and Postgis and update the configuration at the top of main.py.
 
+```
+SRID = 4269
+DB_CONFIG = {
+    "dbname": "test_line_segment_2",
+    "user": "postgres",
+    "password": "admin",
+    "host": "localhost"
+}
+
+MAP_TABLE_NAME = 'maps'
+SAME_AS_TABLE_NAME = 'sameas'
+```
+
 TODO (1/14/2019):
 
 The program shall read the config file directly and should be called as follows;
