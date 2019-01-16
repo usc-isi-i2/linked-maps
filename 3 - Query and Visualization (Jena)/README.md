@@ -21,7 +21,7 @@ How to?
 2. [Add WKT visualization feature](https://github.com/usc-isi-i2/linked-maps/tree/master/3%20-%20Query%20and%20Visualization%20(Jena)/Visualize%20RDF). This will create add-on feature to visualize WKT with Google Map on Jena
 
 Note: Right now we cannot use output from Karam directly. We have to do two things;
-1. add @prefix wkt: <http://www.opengis.net/ont/geosparql#> .
+1. add ```@prefix wkt: <http://www.opengis.net/ont/geosparql#> .```
 2. change from 
 ```<http://localhost:8080/source/43ab5efc> <http://schema.org/geo> "MULTILINESTRING((...))" .```
 to 
