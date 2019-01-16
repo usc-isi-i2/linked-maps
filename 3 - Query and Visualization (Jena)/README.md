@@ -7,6 +7,8 @@ How to?
 2. Download folder ```Visualize Raw``` to local 
 3. Open terminal, navigate to this folder. Run ``` browser-sync start --server --files "*.html, *.json"```
 
+We can use scroll bar to visualize maps from time to time.
+
 Note. JSON version of shapefile can be exported from QGIS WKT and add the comma at the end of the every  line except last line
 
 ### Visualize RDF on Apache Jena (after line segmentation and model with Karma)
