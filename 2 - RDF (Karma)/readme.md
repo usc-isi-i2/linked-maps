@@ -19,3 +19,5 @@ java -cp "postgresql-42.2.5.jre7.jar;karma-offline-0.0.1-SNAPSHOT-shaded.jar" ed
 ```
 
 Once you have already set up, the next time you just navigate to ```\Web-Karma-master\karma-offline\target.``` , and do step 5) and 6).
+
+Note: out.ttl is the real output from this instruction.
