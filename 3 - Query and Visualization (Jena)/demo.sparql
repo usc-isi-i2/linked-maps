@@ -1,0 +1,10 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX wkt: <http://www.opengis.net/ont/geosparql#>
+PREFIX spatial: <http://jena.apache.org/spatial#>
+
+SELECT ?placeName ?wkt
+{
+  ?place spatial:nearby (34.0162520117169 -118.221390358855 10 'km') .
+  ?place rdfs:label ?placeName .
+  ?place wkt:asWKT ?wkt 
+}
