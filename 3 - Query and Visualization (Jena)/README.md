@@ -16,4 +16,4 @@ Note. JSON version of shapefile can be exported from QGIS WKT and add the comma 
 
 How to?
 1. [Set up Apache Jena](https://github.com/usc-isi-i2/linked-maps/tree/master/3%20-%20Query%20and%20Visualization%20(Jena)/Jena%20Setup). Now we will have standard Apache Jena
-2. [Add WKT visualization feature](https://github.com/usc-isi-i2/linked-maps/tree/master/3%20-%20Query%20and%20Visualization%20(Jena)/Visualize%20RDF/webapp). This will create add-on feature to visualize WKT with Google Map on Jena
+2. [Add WKT visualization feature](https://github.com/usc-isi-i2/linked-maps/tree/master/3%20-%20Query%20and%20Visualization%20(Jena)/Visualize%20RDF). This will create add-on feature to visualize WKT with Google Map on Jena
