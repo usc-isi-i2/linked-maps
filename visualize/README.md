@@ -1,3 +1,3 @@
 1. Visualize raw maps (without line segmentation)
-![alt text](https://drive.google.com/file/d/11SLCChHv5HcJMHyl7S-vdoqISx3atE7C/view?usp=sharing)
+![alt text](https://github.com/usc-isi-i2/linked-maps/blob/master/photos/Untitled.png)
 2. Visualize RDF on Apache Jena (after line segmentation and model with Karma)
