@@ -61,7 +61,9 @@ TODO (1/14/2019):
 Right now program does not create wkt column. We do it manually using this query.
 
 ```
+alter table maps
+add column wkr varchar;
 update maps set wkt = st_astext(sub.geom)
 from(select gid, geom from maps) as sub
-where sub.gid = maps.gid
+where sub.gid = maps.gid;
 ```
