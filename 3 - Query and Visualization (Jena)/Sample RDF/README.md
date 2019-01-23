@@ -7,4 +7,5 @@
 ```<http://localhost:8080/source/43ab5efc> <http://schema.org/geo> "MULTILINESTRING((...))" .```
 to 
 ```<http://localhost:8080/source/43ab5efc> wkt:asWKT "MULTILINESTRING((...))"^^wkt:wktLiteral .```
+3. change predicate from <resource> schema:geom <WKT> to <resoruce> wkt:asWKT <WKT>
 
