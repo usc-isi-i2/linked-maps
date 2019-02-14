@@ -127,25 +127,26 @@ class Segment:
             AsIs(self.geom_table_name),
             AsIs(table_name)))
 
-        gid = cursor.fetchall()[0][0]
+        gid = cursor.fetchone()[0]
         cursor.execute("DROP TABLE %s", (AsIs(table_name),))
 
         INSERT_TO_MAP_TABLE = '''
-            INSERT INTO %s (line_name, gid, isLeaf) VALUES (%s, %s, TRUE)
+            INSERT INTO %s (line_name, gid, isLeaf) VALUES (%s, %s, TRUE) RETURNING id;
         '''
         cursor.execute(INSERT_TO_MAP_TABLE, (AsIs(self.map_table_name), table_name, gid))
-        return gid
+        id = cursor.fetchone()[0]
+        return id
 
     def get_all_leaf_nodes(self):
         SQL = '''
-        SELECT gid FROM %s WHERE isLeaf = TRUE
+        SELECT id FROM %s WHERE isLeaf = TRUE
         '''
 
         cur = self.connection.cursor()
         cur.execute(SQL, (AsIs(self.map_table_name),))
         return [t[0] for t in cur.fetchall()]
 
-    def do_segment(self, path_to_shape_file, map_name):
+    def do_segment(self, path_to_shape_file, map_name, verbose=False):
         id = self.add_new_map(path_to_shape_file, map_name)
         leaf_nodes_id = self.get_all_leaf_nodes()
         if id != 1:
@@ -153,22 +154,32 @@ class Segment:
             for r in leaf_nodes_id:
                 if r == id:
                     break
-                self.intersect(r, id)
+
+                new_id = self.intersect(r, id)
+                if verbose:
+                    print "finished intersect row {} and row {} resulting in row {}".format(r, id, new_id)
 
 
             # New Intersect Old
             for r in leaf_nodes_id:
                 if r == id:
                     break
-                self.intersect(id, r)
+                new_id = self.intersect(id, r)
+                if verbose:
+                    print "finished intersect row {} and row {} resulting in row {}".format(id, r, new_id)
 
             # Old Minus New
             for r in leaf_nodes_id:
                 if r == id:
                     break
-                self.minus(r, id)
+                new_id = self.minus(r, id)
+                if verbose:
+                    print "finished  row {} minus row {} resulting in row {}".format(r, id, new_id)
+
             # New Minus ST_UNION(Old)
-            self.union_minus(id)
+            new_id = self.union_minus(id)
+            if verbose:
+                print "finished union row {} resulting in row {}".format(id, new_id)
 
             # Update old leaf node to be false
             self.update_leaf(id)
@@ -194,7 +205,7 @@ class Segment:
         if gid_a != 0 and gid_b != 0:
 
             SQL = '''
-                INSERT INTO geom (wkt, geom) 
+                INSERT INTO %s (wkt, geom) 
                 SELECT ST_ASTEXT(res.lr), lr
                 FROM(
                     SELECT ST_MULTI(ST_INTERSECTION(
@@ -221,6 +232,7 @@ class Segment:
             '''
             cur.execute(SQL,
                 (AsIs(self.geom_table_name),
+                 AsIs(self.geom_table_name),
                  AsIs(self.map_table_name),
                  AsIs(self.geom_table_name),
                  AsIs(self.map_table_name),
@@ -232,12 +244,19 @@ class Segment:
                  AsIs(self.map_table_name),
                  AsIs(self.map_table_name),
                  id_b))
-            new_gid = cur.fetchone()[0]
 
-            cur.execute("INSERT INTO %s (line_name, gid, isLeaf) VALUES (%s, %s, TRUE) RETURNING id",
-                                 (AsIs(self.map_table_name),
-                                  name_a,
-                                  new_gid))
+            new_gid = cur.fetchone()
+            if new_gid:
+                new_gid = new_gid[0]
+                cur.execute("INSERT INTO %s (line_name, gid, isLeaf) VALUES (%s, %s, TRUE) RETURNING id",
+                                     (AsIs(self.map_table_name),
+                                      name_a,
+                                      new_gid))
+            else:
+                cur.execute("INSERT INTO %s (line_name, gid, isLeaf) VALUES (%s, %s, TRUE) RETURNING id",
+                            (AsIs(self.map_table_name),
+                             name_a,
+                             0))
         else:
             cur.execute("INSERT INTO %s (line_name, gid, isLeaf) VALUES (%s, %s, TRUE) RETURNING id",
                                  (AsIs(self.map_table_name),
@@ -272,7 +291,7 @@ class Segment:
                                   gid_a))
         else:
             SQL = '''
-                INSERT INTO geom (wkt, geom) 
+                INSERT INTO %s (wkt, geom) 
                 SELECT ST_ASTEXT(res.lr), lr
                 FROM(
                     SELECT ST_MULTI(ST_INTERSECTION(
@@ -299,6 +318,7 @@ class Segment:
             '''
             cur.execute(SQL,
                 (AsIs(self.geom_table_name),
+                 AsIs(self.geom_table_name),
                  AsIs(self.map_table_name),
                  AsIs(self.geom_table_name),
                  AsIs(self.map_table_name),
@@ -310,12 +330,18 @@ class Segment:
                  AsIs(self.map_table_name),
                  AsIs(self.map_table_name),
                  id_b))
-            new_gid = cur.fetchone()[0]
-            cur.execute("INSERT INTO %s (line_name, gid, isLeaf) VALUES (%s, %s, TRUE) RETURNING id",
-                                 (AsIs(self.map_table_name),
-                                  name_a,
-                                  new_gid))
-
+            new_gid = cur.fetchone()
+            if new_gid:
+                new_gid = new_gid[0]
+                cur.execute("INSERT INTO %s (line_name, gid, isLeaf) VALUES (%s, %s, TRUE) RETURNING id",
+                                     (AsIs(self.map_table_name),
+                                      name_a,
+                                      new_gid))
+            else:
+                cur.execute("INSERT INTO %s (line_name, gid, isLeaf) VALUES (%s, %s, TRUE) RETURNING id",
+                                     (AsIs(self.map_table_name),
+                                      name_a,
+                                      0))
         new_id = cur.fetchone()[0]
         return new_id
 
@@ -325,7 +351,7 @@ class Segment:
         gid, name = cur.fetchone()
 
         SQL = '''
-            INSERT INTO geom (wkt, geom) 
+            INSERT INTO %s (wkt, geom) 
             SELECT ST_ASTEXT(res.lr), lr
             FROM(
                 SELECT ST_MULTI(ST_INTERSECTION(
@@ -352,6 +378,7 @@ class Segment:
         '''
         cur.execute(SQL,
             (AsIs(self.geom_table_name),
+             AsIs(self.geom_table_name),
              AsIs(self.map_table_name),
              AsIs(self.geom_table_name),
              AsIs(self.map_table_name),
