@@ -150,23 +150,22 @@ class Segment:
         id = self.add_new_map(path_to_shape_file, map_name)
         leaf_nodes_id = self.get_all_leaf_nodes()
         if id != 1:
-            # Old Intersect New
+            # Old Intersect New, New Intersect Old
             for r in leaf_nodes_id:
                 if r == id:
                     break
 
-                new_id = self.intersect(r, id)
+                new_id_a = self.intersect(r, id)
                 if verbose:
-                    print "finished intersect row {} and row {} resulting in row {}".format(r, id, new_id)
+                    print "finished intersect row {} and row {} resulting in row {}".format(r, id, new_id_a)
 
-
-            # New Intersect Old
-            for r in leaf_nodes_id:
-                if r == id:
-                    break
-                new_id = self.intersect(id, r)
+                new_id_b = self.intersect(id, r)
                 if verbose:
-                    print "finished intersect row {} and row {} resulting in row {}".format(id, r, new_id)
+                    print "finished intersect row {} and row {} resulting in row {}".format(id, r, new_id_b)
+
+                self.insert_same_as(new_id_a, new_id_b)
+                self.insert_contain(r, new_id_a)
+                self.insert_contain(id, new_id_b)
 
             # Old Minus New
             for r in leaf_nodes_id:
@@ -176,13 +175,47 @@ class Segment:
                 if verbose:
                     print "finished  row {} minus row {} resulting in row {}".format(r, id, new_id)
 
+                self.insert_contain(r, new_id)
+
             # New Minus ST_UNION(Old)
             new_id = self.union_minus(id)
             if verbose:
                 print "finished union row {} resulting in row {}".format(id, new_id)
 
+            self.insert_contain(id, new_id)
+
             # Update old leaf node to be false
             self.update_leaf(id)
+
+    def insert_same_as(self, id_a, id_b):
+        """
+
+        :param id_a:
+        :param id_b:
+        :return:
+        """
+
+        SQL = '''
+            INSERT INTO %s (id1, id2) VALUES (%s, %s)
+        '''
+        cur = self.connection.cursor()
+        cur.execute(SQL, (AsIs(self.same_as_table_name), id_a, id_b))
+
+
+    def insert_contain(self, par_id, child_id):
+        """
+
+        :param id_a:
+        :param id_b:
+        :return:
+        """
+
+        SQL = '''
+            INSERT INTO %s (par_id, child_id) VALUES (%s, %s)
+        '''
+        cur = self.connection.cursor()
+        cur.execute(SQL, (AsIs(self.contain_table_name), par_id, child_id))
+
 
     def update_leaf(self, id):
         cur = self.connection.cursor()
