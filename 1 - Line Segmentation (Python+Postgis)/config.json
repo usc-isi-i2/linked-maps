@@ -1,0 +1,11 @@
+{
+	"dbname": "test_line_segment_4",
+	"user": "postgres",
+	"password": "admin",
+	"host": "localhost",
+	"map_table_name": "map4",
+	"same_as_table_name": "sameas4",
+	"contain_table_name": "contain4",
+	"geom_table_name": "geom4",
+	"SRID": 4269
+}

@@ -2,10 +2,11 @@ import psycopg2
 import osgeo.ogr
 from psycopg2.extensions import AsIs
 import json
-
+import time
 
 '''
     2/13/19
+    Patavee Meemeng
     We see the problem that previous segment algo can't represent all the 
     changes analysis we want. This program will do ONLY difference. To illustrate,
     we have map A. When map B comes we do ST_DIFFERENCE with A. When maps C comes,
@@ -38,10 +39,13 @@ class Segment:
             exit(-1)
 
         try:
-            self.connection = psycopg2.connect(dbname=config["dbname"], user=config["user"],
-                                          password=config["password"], host=config["host"])
+            self.connection = psycopg2.connect(dbname=self.dbname,
+                                               user=self.user,
+                                               password=self.password,
+                                               host=self.host)
+            print "connect to db successfully"
         except psycopg2.Error as e:
-            print ("I am unable to connect to the database", e)
+            print "I am unable to connect to the database", e
             exit(-1)
 
         if is_reset:
@@ -105,6 +109,7 @@ class Segment:
 
         table_name = "_" + map_name
         cursor.execute(SQL, (AsIs(table_name), AsIs(table_name), table_name, self.SRID,))
+
         layer = shapefile.GetLayer(0)
 
         SQL_2 = '''
@@ -147,8 +152,16 @@ class Segment:
         return [t[0] for t in cur.fetchall()]
 
     def do_segment(self, path_to_shape_file, map_name, verbose=False):
+        if verbose:
+            print "***Start segment map {} ...".format(map_name)
+        start = time.time()
         id = self.add_new_map(path_to_shape_file, map_name)
+        if verbose:
+            print "Map {} successfully added to row id {}".format(map_name, id)
         leaf_nodes_id = self.get_all_leaf_nodes()
+        if verbose:
+            print "New map will segment with {} leaf nodes: {}".format(len(leaf_nodes_id),
+                                                                       " ".join((str(e) for e in leaf_nodes_id)))
         if id != 1:
             # Old Intersect New, New Intersect Old
             for r in leaf_nodes_id:
@@ -186,6 +199,8 @@ class Segment:
 
             # Update old leaf node to be false
             self.update_leaf(id)
+            if verbose:
+                print "***Finished segment map {} in {} seconds\n".format(map_name, str(time.time() - start))
 
     def insert_same_as(self, id_a, id_b):
         """
@@ -219,7 +234,7 @@ class Segment:
 
     def update_leaf(self, id):
         cur = self.connection.cursor()
-        cur.execute("UPDATE %s SET isLeaf = FALSE WHERE gid <= %s", (AsIs(self.map_table_name), id))
+        cur.execute("UPDATE %s SET isLeaf = FALSE WHERE id <= %s", (AsIs(self.map_table_name), id))
 
     def intersect(self, id_a, id_b):
         """
