@@ -4,14 +4,18 @@ The abstract idea of line segmentation shall be described in section 2 of [this 
 
 To run this line segmentation program, we need to setup the environment.
 
-1. Installed PostgreSQL with PostGIS. This program was tested with PostgreSQL 9.6 and PostGIS 2.4
-2. Create the database in which the line segmentation program will perform
-3. Create the Postgis extension on that database
+1. Installed Python 2.7 and do
+```
+pip install psycopg2 osgeo
+```
+2. Installed PostgreSQL with PostGIS. This program was tested with PostgreSQL 9.6 and PostGIS 2.4
+3. Create the database in which the line segmentation program will perform
+4. Create the Postgis extension on that database
 ```
  CREATE EXTENSION postgis;
  ```
- 4. Edit your config.json accordingly.
- 5. Run this command
+ 5. Edit your config.json accordingly.
+ 6. Run this command
  ```
  python main.py -a /path/to/shpfiles/ /path/to/config/file/
  ```
