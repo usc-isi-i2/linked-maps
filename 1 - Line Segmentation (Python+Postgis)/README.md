@@ -12,5 +12,5 @@ To run this line segmentation program, we need to setup the environment.
  ```
  4. Edit your config.json accordingly.
  5. Run this command
- ```python main.py -a /path/to/shpfiles/```
+ ```python main.py -a /path/to/shpfiles/ /path/to/config/file/```
 This will run the line segmentation program in automatic mode, which will perform segmentation for all shapefiles in the folder. Alternatively, run ```python main.py -m``` This will run the line segmentation program manually. You will need to specify what do you want do by yourselves.
