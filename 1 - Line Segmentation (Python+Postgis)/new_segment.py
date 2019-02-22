@@ -164,10 +164,10 @@ class Segment:
                                                                        " ".join((str(e) for e in leaf_nodes_id)))
         if id != 1:
             # Old Intersect New, New Intersect Old
+
             for r in leaf_nodes_id:
                 if r == id:
-                    break
-
+                    continue
                 new_id_a = self.intersect(r, id)
                 if verbose:
                     print "finished intersect row {} and row {} resulting in row {}".format(r, id, new_id_a)
@@ -183,7 +183,7 @@ class Segment:
             # Old Minus New
             for r in leaf_nodes_id:
                 if r == id:
-                    break
+                    continue
                 new_id = self.minus(r, id)
                 if verbose:
                     print "finished  row {} minus row {} resulting in row {}".format(r, id, new_id)
