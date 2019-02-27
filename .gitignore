@@ -1,4 +1,4 @@
-scale_test/test_rdf/*
-*.csv
-karma_project/test.py
 .DS_Store
+__pycache__
+*.pyc
+*.csv
