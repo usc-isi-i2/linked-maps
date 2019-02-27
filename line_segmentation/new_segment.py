@@ -4,58 +4,65 @@ from psycopg2.extensions import AsIs
 import json
 import time
 
-'''
-    2/13/19
-    Patavee Meemeng
-    We see the problem that previous segment algo can't represent all the 
-    changes analysis we want. This program will do ONLY difference. To illustrate,
-    we have map A. When map B comes we do ST_DIFFERENCE with A. When maps C comes,
-    we do the ST_DIFFERENCE from C to A and B. This also miss some change analysis
-    that previous algorithm can do, such as "segment that stay the same from A->B
-    but change in C.
-'''
+COLOR_RESET = "\033[0m"
+COLOR_GREEN = "\033[32m"
+COLOR_CYAN = "\033[36m"
+COLOR_YELLOW = "\033[33m"
+VERBOSE = True
+VERBOSE_PRINT_SQL = True
 
+def VPRINT(pstring):
+    global VERBOSE
+    if VERBOSE: print(COLOR_CYAN + pstring + COLOR_RESET)
+
+def VPRINTSQL(pstring):
+    global VERBOSE_PRINT_SQL
+    if VERBOSE_PRINT_SQL: print(COLOR_YELLOW + pstring + COLOR_RESET)
 
 class Segment:
-    def __init__(self, config_path, is_reset=False):
+    # create class (connect to database, create tables if user asks)
+    def __init__(self, config_path, is_reset = False):
         try:
             config = json.load(open(config_path, "r"))
         except Exception as e:
-            print "cannot load config file, ERROR: ", e
+            print("cannot load config file, ERROR: %s" % str(e))
             exit(-1)
 
         try:
-            self.dbname = config["dbname"]
-            self.user = config["user"]
-            self.password = config["password"]
-            self.host = config["host"]
-            self.map_table_name =config["map_table_name"]
+            self.dbname             = config["dbname"]
+            self.user               = config["user"]
+            self.host               = config["host"]
+            self.map_table_name     = config["map_table_name"]
             self.same_as_table_name = config["same_as_table_name"]
             self.contain_table_name = config["contain_table_name"]
-            self.geom_table_name =config["geom_table_name"]
-            self.SRID = config["SRID"]
+            self.geom_table_name    = config["geom_table_name"]
+            self.SRID               = config["SRID"]
         except LookupError:
-            print "invalid config JSON"
+            print("invalid config JSON")
             exit(-1)
 
+        print(self.dbname, self.user, self.host, self.map_table_name, self.same_as_table_name,
+            self.contain_table_name, self.geom_table_name, self.SRID)
+
         try:
-            self.connection = psycopg2.connect(dbname=self.dbname,
-                                               user=self.user,
-                                               password=self.password,
-                                               host=self.host)
-            print "connect to db successfully"
+            self.connection = psycopg2.connect(dbname   = self.dbname,
+                                               user     = self.user,
+                                               host     = self.host)
+            print(COLOR_GREEN + "Connected to database successfully" + COLOR_RESET)
         except psycopg2.Error as e:
-            print "I am unable to connect to the database", e
+            print("Unable to connect to the database: %s" % str(e))
             exit(-1)
 
         if is_reset:
             self.create_starting_table()
 
+    # perform SQL commit (change tables)
     def commit(self):
         self.connection.commit()
 
     def create_starting_table(self):
         # TODO Add FK to table
+        # WTF is FK?
 
         cur = self.connection.cursor()
         SQL = '''
@@ -97,7 +104,10 @@ class Segment:
                      AsIs(self.contain_table_name))
                     )
 
+        VPRINTSQL(str(cur.query))
+        self.commit()
 
+    # create new map segment entry
     def add_new_map(self, fname, map_name):
         cursor = self.connection.cursor()
         shapefile = osgeo.ogr.Open(fname)
@@ -140,6 +150,10 @@ class Segment:
         '''
         cursor.execute(INSERT_TO_MAP_TABLE, (AsIs(self.map_table_name), table_name, gid))
         id = cursor.fetchone()[0]
+
+        VPRINTSQL(str(cursor.query))
+        self.commit()
+
         return id
 
     def get_all_leaf_nodes(self):
@@ -151,31 +165,29 @@ class Segment:
         cur.execute(SQL, (AsIs(self.map_table_name),))
         return [t[0] for t in cur.fetchall()]
 
-    def do_segment(self, path_to_shape_file, map_name, verbose=False):
-        if verbose:
-            print "***Start segment map {} ...".format(map_name)
-        start = time.time()
+    # create the segment (called from main)
+    def do_segment(self, path_to_shape_file, map_name, verbose = False):
+        global VERBOSE
+        VERBOSE = verbose
+
+        VPRINT("Start segment map %s..." % map_name)
+        start_time = time.time()
         id = self.add_new_map(path_to_shape_file, map_name)
-        if verbose:
-            print "Map {} successfully added to row id {}".format(map_name, id)
+        VPRINT("Map %s successfully added to row id %s" % (map_name, id))
         leaf_nodes_id = self.get_all_leaf_nodes()
-        if verbose:
-            print "New map will segment with {} leaf nodes: {}".format(len(leaf_nodes_id),
-                                                                       " ".join((str(e) for e in leaf_nodes_id)))
+        VPRINT("New map will segment with %d leaf nodes: {%s}" % (len(leaf_nodes_id), ",".join((str(e) for e in leaf_nodes_id))))
+
         if id != 1:
             # Old Intersect New, New Intersect Old
-
             for r in leaf_nodes_id:
                 if r == id:
                     continue
+                curr_timer_meas = time.time()
                 new_id_a = self.intersect(r, id)
-                if verbose:
-                    print "finished intersect row {} and row {} resulting in row {}".format(r, id, new_id_a)
-
+                VPRINT("finished intersect row %d and row %d resulting in row %d (took %.2f seconds)" % (r, id, new_id_a, (time.time() - curr_timer_meas)))
+                curr_timer_meas = time.time()
                 new_id_b = self.intersect(id, r)
-                if verbose:
-                    print "finished intersect row {} and row {} resulting in row {}".format(id, r, new_id_b)
-
+                VPRINT("finished intersect row %d and row %d resulting in row %d (took %.2f seconds)" % (id, r, new_id_b, (time.time() - curr_timer_meas)))
                 self.insert_same_as(new_id_a, new_id_b)
                 self.insert_contain(r, new_id_a)
                 self.insert_contain(id, new_id_b)
@@ -184,58 +196,43 @@ class Segment:
             for r in leaf_nodes_id:
                 if r == id:
                     continue
+                curr_timer_meas = time.time()
                 new_id = self.minus(r, id)
-                if verbose:
-                    print "finished  row {} minus row {} resulting in row {}".format(r, id, new_id)
-
+                VPRINT("finished row %d minus row %d resulting in row %d (took %.2f seconds)" % (r, id, new_id, (time.time() - curr_timer_meas)))
                 self.insert_contain(r, new_id)
 
             # New Minus ST_UNION(Old)
+            curr_timer_meas = time.time()
             new_id = self.union_minus(id)
-            if verbose:
-                print "finished union row {} resulting in row {}".format(id, new_id)
-
+            VPRINT("finished union row %d resulting in row %d (took %.2f seconds)" % (id, new_id, (time.time() - curr_timer_meas)))
             self.insert_contain(id, new_id)
 
             # Update old leaf node to be false
             self.update_leaf(id)
-            if verbose:
-                print "***Finished segment map {} in {} seconds\n".format(map_name, str(time.time() - start))
+            VPRINT("Finished segmenting map %s (took %.2f seconds)\n" % (map_name, (time.time() - start_time)))
 
+    # create a same_as entry
     def insert_same_as(self, id_a, id_b):
-        """
-
-        :param id_a:
-        :param id_b:
-        :return:
-        """
-
         SQL = '''
             INSERT INTO %s (id1, id2) VALUES (%s, %s)
         '''
         cur = self.connection.cursor()
         cur.execute(SQL, (AsIs(self.same_as_table_name), id_a, id_b))
 
-
+    # create a contain entry
     def insert_contain(self, par_id, child_id):
-        """
-
-        :param id_a:
-        :param id_b:
-        :return:
-        """
-
         SQL = '''
             INSERT INTO %s (par_id, child_id) VALUES (%s, %s)
         '''
         cur = self.connection.cursor()
         cur.execute(SQL, (AsIs(self.contain_table_name), par_id, child_id))
 
-
+    # mark entries with older id's as not-leaf anymore
     def update_leaf(self, id):
         cur = self.connection.cursor()
         cur.execute("UPDATE %s SET isLeaf = FALSE WHERE id <= %s", (AsIs(self.map_table_name), id))
 
+    # create an intersection entry
     def intersect(self, id_a, id_b):
         """
         do intersection between id_a and id_b
@@ -314,12 +311,8 @@ class Segment:
         # TODO: update sameAs and Contain
         return new_id
 
+    # create a MAP-MINUS-MAP entry
     def minus(self, id_a, id_b):
-        """
-        :param id_a:
-        :param id_b:
-        :return:
-        """
         cur = self.connection.cursor()
         # check gid of id_a and gid of id_b
         cur.execute("SELECT gid, line_name FROM %s WHERE id = %s", (AsIs(self.map_table_name), id_a))
@@ -393,6 +386,7 @@ class Segment:
         new_id = cur.fetchone()[0]
         return new_id
 
+    # create a UNION-MINUS-MAP entry
     def union_minus(self, id):
         cur = self.connection.cursor()
         cur.execute("SELECT gid, line_name FROM %s WHERE id = %s", (AsIs(self.map_table_name), id))
