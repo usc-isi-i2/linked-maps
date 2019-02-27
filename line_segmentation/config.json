@@ -1,0 +1,10 @@
+{
+    "dbname": "linkedmap",
+    "user": "baselshbita",
+    "host": "localhost",
+    "map_table_name": "map_basels",
+    "same_as_table_name": "sameas_basels",
+    "contain_table_name": "contain_basels",
+    "geom_table_name": "geom_basels",
+    "SRID": 4269
+}
