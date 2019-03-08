@@ -41,9 +41,6 @@ class Segment:
             print("invalid config JSON")
             exit(-1)
 
-        print(self.dbname, self.user, self.host, self.map_table_name, self.same_as_table_name,
-            self.contain_table_name, self.geom_table_name, self.SRID)
-
         try:
             self.connection = psycopg2.connect(dbname   = self.dbname,
                                                user     = self.user,
@@ -57,7 +54,7 @@ class Segment:
             self.create_starting_table()
 
     # perform SQL commit (change tables)
-    def commit(self):
+    def sql_commit(self):
         self.connection.commit()
 
     def create_starting_table(self):
@@ -105,7 +102,7 @@ class Segment:
                     )
 
         VPRINTSQL(str(cur.query))
-        self.commit()
+        self.sql_commit()
 
     # create new map segment entry
     def add_new_map(self, fname, map_name):
@@ -119,6 +116,7 @@ class Segment:
 
         table_name = "_" + map_name
         cursor.execute(SQL, (AsIs(table_name), AsIs(table_name), table_name, self.SRID,))
+        VPRINTSQL(str(cursor.query))
 
         layer = shapefile.GetLayer(0)
 
@@ -126,11 +124,15 @@ class Segment:
         INSERT INTO %s (geom) VALUES (ST_MULTI(ST_GeometryFromText(%s, %s)))
         '''
 
-        for i in range(layer.GetFeatureCount()):
+        total_feature_count_in_map = layer.GetFeatureCount()
+        for i in range(total_feature_count_in_map):
             feature = layer.GetFeature(i)
             # name = feature.GetField("NAME").decode("Latin-1")
             wkt = feature.GetGeometryRef().ExportToWkt()
             cursor.execute(SQL_2, (AsIs(table_name), wkt, self.SRID))
+            # VPRINTSQL(str(cursor.query))
+        VPRINT("Added %d Geometry lines to %s" % (total_feature_count_in_map, table_name))
+        
 
         INSERT_NEW_MAP = '''
             INSERT INTO %s (wkt, geom)
@@ -141,18 +143,19 @@ class Segment:
         cursor.execute(INSERT_NEW_MAP, (
             AsIs(self.geom_table_name),
             AsIs(table_name)))
+        VPRINTSQL(str(cursor.query))
 
         gid = cursor.fetchone()[0]
         cursor.execute("DROP TABLE %s", (AsIs(table_name),))
+        # VPRINTSQL(str(cursor.query))
 
         INSERT_TO_MAP_TABLE = '''
             INSERT INTO %s (line_name, gid, isLeaf) VALUES (%s, %s, TRUE) RETURNING id;
         '''
         cursor.execute(INSERT_TO_MAP_TABLE, (AsIs(self.map_table_name), table_name, gid))
         id = cursor.fetchone()[0]
-
         VPRINTSQL(str(cursor.query))
-        self.commit()
+        self.sql_commit()
 
         return id
 
@@ -218,6 +221,7 @@ class Segment:
         '''
         cur = self.connection.cursor()
         cur.execute(SQL, (AsIs(self.same_as_table_name), id_a, id_b))
+        VPRINTSQL(str(cur.query))
 
     # create a contain entry
     def insert_contain(self, par_id, child_id):
@@ -226,11 +230,13 @@ class Segment:
         '''
         cur = self.connection.cursor()
         cur.execute(SQL, (AsIs(self.contain_table_name), par_id, child_id))
+        VPRINTSQL(str(cur.query))
 
     # mark entries with older id's as not-leaf anymore
     def update_leaf(self, id):
         cur = self.connection.cursor()
         cur.execute("UPDATE %s SET isLeaf = FALSE WHERE id <= %s", (AsIs(self.map_table_name), id))
+        VPRINTSQL(str(cur.query))
 
     # create an intersection entry
     def intersect(self, id_a, id_b):
@@ -244,6 +250,7 @@ class Segment:
         # check gid of id_a and gid of id_b
         cur.execute("SELECT gid, line_name FROM %s WHERE id = %s", (AsIs(self.map_table_name), id_a))
         gid_a, name_a = cur.fetchone()
+
         cur.execute("SELECT gid, line_name FROM %s WHERE id = %s", (AsIs(self.map_table_name), id_b))
         gid_b, name_b = cur.fetchone()
 
@@ -291,6 +298,8 @@ class Segment:
                  id_b))
 
             new_gid = cur.fetchone()
+            # VPRINTSQL(str(cur.query))
+
             if new_gid:
                 new_gid = new_gid[0]
                 cur.execute("INSERT INTO %s (line_name, gid, isLeaf) VALUES (%s, %s, TRUE) RETURNING id",
@@ -302,11 +311,13 @@ class Segment:
                             (AsIs(self.map_table_name),
                              name_a,
                              0))
+            # VPRINTSQL(str(cur.query))
         else:
             cur.execute("INSERT INTO %s (line_name, gid, isLeaf) VALUES (%s, %s, TRUE) RETURNING id",
                                  (AsIs(self.map_table_name),
                                   name_a,
                                   0))
+            # PRINTSQL(str(cur.query))
         new_id = cur.fetchone()[0]
         # TODO: update sameAs and Contain
         return new_id
@@ -372,6 +383,7 @@ class Segment:
                  AsIs(self.map_table_name),
                  id_b))
             new_gid = cur.fetchone()
+            # VPRINTSQL(str(cur.query))
             if new_gid:
                 new_gid = new_gid[0]
                 cur.execute("INSERT INTO %s (line_name, gid, isLeaf) VALUES (%s, %s, TRUE) RETURNING id",
@@ -383,6 +395,7 @@ class Segment:
                                      (AsIs(self.map_table_name),
                                       name_a,
                                       0))
+            # VPRINTSQL(str(cur.query))
         new_id = cur.fetchone()[0]
         return new_id
 
@@ -438,6 +451,5 @@ class Segment:
                              (AsIs(self.map_table_name),
                               name,
                               new_gid))
-
         new_id = cur.fetchone()[0]
         return new_id
