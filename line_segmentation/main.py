@@ -20,7 +20,7 @@ if __name__ == "__main__":
                 except Exception as e:
                     print("failed segmenting file %s\n%s" % (full_fname, str(e)))
                     exit(-1)
-                segment.commit()
+                segment.sql_commit()
         print("Segmentation done!")
 
     else:
