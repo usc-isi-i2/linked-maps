@@ -1,6 +1,7 @@
 @prefix dct: <http://purl.org/dc/terms/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix karma: <http://isi.edu/integration/karma/ontologies/model/current#> .
 @prefix ns1: <http://www.w3.org/2004/02/skos/core#> .
 @prefix schema: <http://schema.org/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -8,13 +9,13 @@
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix km-dev: <http://isi.edu/integration/karma/dev#> .
 
-_:node1catpo3udx1 a km-dev:R2RMLMapping ;
-	km-dev:sourceName "contain.csv" ;
-	km-dev:modelPublicationTime "1523565989837"^^xsd:long ;
+_:node1d4sgfp9bx1 a km-dev:R2RMLMapping ;
+	km-dev:sourceName "public.<same_as_table_name>" ;
+	km-dev:modelPublicationTime "1551440012588"^^xsd:long ;
 	km-dev:modelVersion "1.7" ;
-	km-dev:hasInputColumns "[[{\"columnName\":\"id\"}],[{\"columnName\":\"contains\"}]]" ;
-	km-dev:hasOutputColumns "[[{\"columnName\":\"id\"}],[{\"columnName\":\"contains\"}]]" ;
-	km-dev:hasModelLabel "contain.csv" ;
+	km-dev:hasInputColumns "[[{\"columnName\":\"id1\"}],[{\"columnName\":\"id2\"}]]" ;
+	km-dev:hasOutputColumns "[[{\"columnName\":\"id1\"}],[{\"columnName\":\"id2\"}]]" ;
+	km-dev:hasModelLabel "public.<same_as_table_name>" ;
 	km-dev:hasBaseURI "http://localhost:8080/source/" ;
 	km-dev:hasWorksheetHistory """[
     {
@@ -24,7 +25,7 @@ _:node1catpo3udx1 a km-dev:R2RMLMapping ;
             {
                 \"name\": \"hNodeId\",
                 \"type\": \"hNodeId\",
-                \"value\": [{\"columnName\": \"id\"}]
+                \"value\": [{\"columnName\": \"id1\"}]
             },
             {
                 \"name\": \"worksheetId\",
@@ -81,12 +82,12 @@ _:node1catpo3udx1 a km-dev:R2RMLMapping ;
             {
                 \"name\": \"inputColumns\",
                 \"type\": \"hNodeIdList\",
-                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"id\\\"}]}]\"
+                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"id1\\\"}]}]\"
             },
             {
                 \"name\": \"outputColumns\",
                 \"type\": \"hNodeIdList\",
-                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"id\\\"}]}]\"
+                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"id1\\\"}]}]\"
             }
         ],
         \"tags\": [\"SemanticType\"]
@@ -98,7 +99,7 @@ _:node1catpo3udx1 a km-dev:R2RMLMapping ;
             {
                 \"name\": \"hNodeId\",
                 \"type\": \"hNodeId\",
-                \"value\": [{\"columnName\": \"contains\"}]
+                \"value\": [{\"columnName\": \"id2\"}]
             },
             {
                 \"name\": \"worksheetId\",
@@ -155,46 +156,15 @@ _:node1catpo3udx1 a km-dev:R2RMLMapping ;
             {
                 \"name\": \"inputColumns\",
                 \"type\": \"hNodeIdList\",
-                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"contains\\\"}]}]\"
+                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"id2\\\"}]}]\"
             },
             {
                 \"name\": \"outputColumns\",
                 \"type\": \"hNodeIdList\",
-                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"contains\\\"}]}]\"
+                \"value\": \"[{\\\"value\\\":[{\\\"columnName\\\":\\\"id2\\\"}]}]\"
             }
         ],
         \"tags\": [\"SemanticType\"]
-    },
-    {
-        \"commandName\": \"DeleteLinkCommand\",
-        \"model\": \"new\",
-        \"inputParameters\": [
-            {
-                \"name\": \"worksheetId\",
-                \"type\": \"worksheetId\",
-                \"value\": \"W\"
-            },
-            {
-                \"name\": \"edge\",
-                \"type\": \"other\",
-                \"value\": {
-                    \"edgeTargetId\": \"http://schema.org/Map2\",
-                    \"edgeId\": \"http://schema.org/sameAs\",
-                    \"edgeSourceId\": \"http://schema.org/Map1\"
-                }
-            },
-            {
-                \"name\": \"inputColumns\",
-                \"type\": \"hNodeIdList\",
-                \"value\": \"[]\"
-            },
-            {
-                \"name\": \"outputColumns\",
-                \"type\": \"hNodeIdList\",
-                \"value\": \"[]\"
-            }
-        ],
-        \"tags\": [\"Modeling\"]
     },
     {
         \"commandName\": \"AddLinkCommand\",
@@ -210,7 +180,7 @@ _:node1catpo3udx1 a km-dev:R2RMLMapping ;
                 \"type\": \"other\",
                 \"value\": {
                     \"edgeTargetId\": \"http://schema.org/Map2\",
-                    \"edgeId\": \"http://schema.org/hasPart\",
+                    \"edgeId\": \"http://schema.org/sameAs\",
                     \"edgeTargetUri\": \"http://schema.org/Map\",
                     \"edgeSourceId\": \"http://schema.org/Map1\",
                     \"edgeSourceUri\": \"http://schema.org/Map\"
@@ -231,66 +201,66 @@ _:node1catpo3udx1 a km-dev:R2RMLMapping ;
     }
 ]""" .
 
-km-dev:TriplesMap_99a42f02-b7d4-4f91-93c1-44963c29c748 a rr:TriplesMap .
+km-dev:TriplesMap_39f12752-12bd-4c38-a898-8bb973e1c234 a rr:TriplesMap .
 
-_:node1catpo3udx1 km-dev:hasTriplesMap km-dev:TriplesMap_99a42f02-b7d4-4f91-93c1-44963c29c748 .
+_:node1d4sgfp9bx1 km-dev:hasTriplesMap km-dev:TriplesMap_39f12752-12bd-4c38-a898-8bb973e1c234 .
 
-km-dev:TriplesMap_99a42f02-b7d4-4f91-93c1-44963c29c748 km-dev:isPartOfMapping _:node1catpo3udx1 .
+km-dev:TriplesMap_39f12752-12bd-4c38-a898-8bb973e1c234 km-dev:isPartOfMapping _:node1d4sgfp9bx1 .
 
-_:node1catpo3udx2 rr:tableName "contain.csv" ;
+_:node1d4sgfp9bx2 rr:tableName "public.<same_as_table_name>" ;
 	a rr:LogicalTable ;
-	km-dev:isPartOfMapping _:node1catpo3udx1 .
+	km-dev:isPartOfMapping _:node1d4sgfp9bx1 .
 
-_:node1catpo3udx1 km-dev:hasLogicalTable _:node1catpo3udx2 .
+_:node1d4sgfp9bx1 km-dev:hasLogicalTable _:node1d4sgfp9bx2 .
 
-km-dev:TriplesMap_99a42f02-b7d4-4f91-93c1-44963c29c748 rr:logicalTable _:node1catpo3udx2 ;
-	rr:subjectMap _:node1catpo3udx3 .
+km-dev:TriplesMap_39f12752-12bd-4c38-a898-8bb973e1c234 rr:logicalTable _:node1d4sgfp9bx2 ;
+	rr:subjectMap _:node1d4sgfp9bx3 .
 
-_:node1catpo3udx1 km-dev:hasSubjectMap _:node1catpo3udx3 .
+_:node1d4sgfp9bx1 km-dev:hasSubjectMap _:node1d4sgfp9bx3 .
 
-_:node1catpo3udx3 km-dev:isPartOfMapping _:node1catpo3udx1 ;
+_:node1d4sgfp9bx3 km-dev:isPartOfMapping _:node1d4sgfp9bx1 ;
 	a rr:SubjectMap ;
 	km-dev:alignmentNodeId "http://schema.org/Map1" ;
 	rr:class schema:Map ;
-	rr:template "{id}" ;
+	rr:template "{id1}" ;
 	a km-dev:steinerTreeRootNode .
 
-km-dev:PredicateObjectMap_8ffb446e-9f2f-4586-b61a-a9cf08fb8fd5 rr:predicate schema:hasPart .
+km-dev:PredicateObjectMap_38367737-6a91-4922-90f9-cb96375e7786 rr:predicate schema:sameAs .
 
-km-dev:RefObjectMap_1c111234-5920-434f-a321-df49a3542f47 a rr:RefObjectMap , rr:ObjectMap ;
-	rr:parentTriplesMap km-dev:TriplesMap_44d99c38-2e01-4426-9342-58d48f487ea9 ;
-	km-dev:isPartOfMapping _:node1catpo3udx1 .
+km-dev:RefObjectMap_e0660de7-399b-4436-8acb-afa7effee641 a rr:RefObjectMap , rr:ObjectMap ;
+	rr:parentTriplesMap km-dev:TriplesMap_b53eb7a9-83f3-40d0-995c-09422c90799c ;
+	km-dev:isPartOfMapping _:node1d4sgfp9bx1 .
 
-_:node1catpo3udx1 km-dev:hasObjectMap km-dev:RefObjectMap_1c111234-5920-434f-a321-df49a3542f47 .
+_:node1d4sgfp9bx1 km-dev:hasObjectMap km-dev:RefObjectMap_e0660de7-399b-4436-8acb-afa7effee641 .
 
-km-dev:PredicateObjectMap_8ffb446e-9f2f-4586-b61a-a9cf08fb8fd5 rr:objectMap km-dev:RefObjectMap_1c111234-5920-434f-a321-df49a3542f47 .
+km-dev:PredicateObjectMap_38367737-6a91-4922-90f9-cb96375e7786 rr:objectMap km-dev:RefObjectMap_e0660de7-399b-4436-8acb-afa7effee641 .
 
-km-dev:TriplesMap_99a42f02-b7d4-4f91-93c1-44963c29c748 rr:predicateObjectMap km-dev:PredicateObjectMap_8ffb446e-9f2f-4586-b61a-a9cf08fb8fd5 .
+km-dev:TriplesMap_39f12752-12bd-4c38-a898-8bb973e1c234 rr:predicateObjectMap km-dev:PredicateObjectMap_38367737-6a91-4922-90f9-cb96375e7786 .
 
-km-dev:PredicateObjectMap_8ffb446e-9f2f-4586-b61a-a9cf08fb8fd5 a rr:PredicateObjectMap ;
-	km-dev:isPartOfMapping _:node1catpo3udx1 .
+km-dev:PredicateObjectMap_38367737-6a91-4922-90f9-cb96375e7786 a rr:PredicateObjectMap ;
+	km-dev:isPartOfMapping _:node1d4sgfp9bx1 .
 
-_:node1catpo3udx1 km-dev:hasPredicateObjectMap km-dev:PredicateObjectMap_8ffb446e-9f2f-4586-b61a-a9cf08fb8fd5 .
+_:node1d4sgfp9bx1 km-dev:hasPredicateObjectMap km-dev:PredicateObjectMap_38367737-6a91-4922-90f9-cb96375e7786 .
 
-km-dev:TriplesMap_44d99c38-2e01-4426-9342-58d48f487ea9 a rr:TriplesMap .
+km-dev:TriplesMap_b53eb7a9-83f3-40d0-995c-09422c90799c a rr:TriplesMap .
 
-_:node1catpo3udx1 km-dev:hasTriplesMap km-dev:TriplesMap_44d99c38-2e01-4426-9342-58d48f487ea9 .
+_:node1d4sgfp9bx1 km-dev:hasTriplesMap km-dev:TriplesMap_b53eb7a9-83f3-40d0-995c-09422c90799c .
 
-km-dev:TriplesMap_44d99c38-2e01-4426-9342-58d48f487ea9 km-dev:isPartOfMapping _:node1catpo3udx1 .
+km-dev:TriplesMap_b53eb7a9-83f3-40d0-995c-09422c90799c km-dev:isPartOfMapping _:node1d4sgfp9bx1 .
 
-_:node1catpo3udx4 rr:tableName "contain.csv" ;
+_:node1d4sgfp9bx4 rr:tableName "public.<same_as_table_name>" ;
 	a rr:LogicalTable ;
-	km-dev:isPartOfMapping _:node1catpo3udx1 .
+	km-dev:isPartOfMapping _:node1d4sgfp9bx1 .
 
-_:node1catpo3udx1 km-dev:hasLogicalTable _:node1catpo3udx4 .
+_:node1d4sgfp9bx1 km-dev:hasLogicalTable _:node1d4sgfp9bx4 .
 
-km-dev:TriplesMap_44d99c38-2e01-4426-9342-58d48f487ea9 rr:logicalTable _:node1catpo3udx4 ;
-	rr:subjectMap _:node1catpo3udx5 .
+km-dev:TriplesMap_b53eb7a9-83f3-40d0-995c-09422c90799c rr:logicalTable _:node1d4sgfp9bx4 ;
+	rr:subjectMap _:node1d4sgfp9bx5 .
 
-_:node1catpo3udx1 km-dev:hasSubjectMap _:node1catpo3udx5 .
+_:node1d4sgfp9bx1 km-dev:hasSubjectMap _:node1d4sgfp9bx5 .
 
-_:node1catpo3udx5 km-dev:isPartOfMapping _:node1catpo3udx1 ;
+_:node1d4sgfp9bx5 km-dev:isPartOfMapping _:node1d4sgfp9bx1 ;
 	a rr:SubjectMap ;
 	km-dev:alignmentNodeId "http://schema.org/Map2" ;
 	rr:class schema:Map ;
-	rr:template "{contains}" .
+	rr:template "{id2}" .
