@@ -1,0 +1,144 @@
+<http://localhost:8080/source/3> <http://schema.org/sameAs> <http://localhost:8080/source/4> .
+<http://localhost:8080/source/4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/4> <http://schema.org/sameAs> <http://localhost:8080/source/3> .
+<http://localhost:8080/source/3> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/4> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/8> <http://schema.org/sameAs> <http://localhost:8080/source/9> .
+<http://localhost:8080/source/9> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/8> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/9> <http://schema.org/sameAs> <http://localhost:8080/source/8> .
+<http://localhost:8080/source/8> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/9> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/10> <http://schema.org/sameAs> <http://localhost:8080/source/11> .
+<http://localhost:8080/source/11> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/10> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/11> <http://schema.org/sameAs> <http://localhost:8080/source/10> .
+<http://localhost:8080/source/10> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/11> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/12> <http://schema.org/sameAs> <http://localhost:8080/source/13> .
+<http://localhost:8080/source/13> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/12> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/13> <http://schema.org/sameAs> <http://localhost:8080/source/12> .
+<http://localhost:8080/source/13> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/12> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/15> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/14> <http://schema.org/sameAs> <http://localhost:8080/source/15> .
+<http://localhost:8080/source/14> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/15> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/14> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/15> <http://schema.org/sameAs> <http://localhost:8080/source/14> .
+
+<http://localhost:8080/source/22> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/23> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/22> <http://schema.org/sameAs> <http://localhost:8080/source/23> .
+
+<http://localhost:8080/source/22> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/23> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/23> <http://schema.org/sameAs> <http://localhost:8080/source/22> .
+
+<http://localhost:8080/source/25> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/24> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/24> <http://schema.org/sameAs> <http://localhost:8080/source/25> .
+
+<http://localhost:8080/source/25> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/24> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/25> <http://schema.org/sameAs> <http://localhost:8080/source/24> .
+
+<http://localhost:8080/source/26> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/27> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/26> <http://schema.org/sameAs> <http://localhost:8080/source/27> .
+
+<http://localhost:8080/source/26> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/27> <http://schema.org/sameAs> <http://localhost:8080/source/26> .
+<http://localhost:8080/source/27> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/29> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/28> <http://schema.org/sameAs> <http://localhost:8080/source/29> .
+<http://localhost:8080/source/28> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/29> <http://schema.org/sameAs> <http://localhost:8080/source/28> .
+<http://localhost:8080/source/28> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/29> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/30> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/31> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/30> <http://schema.org/sameAs> <http://localhost:8080/source/31> .
+
+<http://localhost:8080/source/30> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/31> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/31> <http://schema.org/sameAs> <http://localhost:8080/source/30> .
+
+<http://localhost:8080/source/33> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/32> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/32> <http://schema.org/sameAs> <http://localhost:8080/source/33> .
+
+<http://localhost:8080/source/32> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/33> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/33> <http://schema.org/sameAs> <http://localhost:8080/source/32> .
+
+<http://localhost:8080/source/35> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/34> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/34> <http://schema.org/sameAs> <http://localhost:8080/source/35> .
+
+<http://localhost:8080/source/35> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/34> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/35> <http://schema.org/sameAs> <http://localhost:8080/source/34> .
+
+<http://localhost:8080/source/37> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/36> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/36> <http://schema.org/sameAs> <http://localhost:8080/source/37> .
+
+<http://localhost:8080/source/37> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/36> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/37> <http://schema.org/sameAs> <http://localhost:8080/source/36> .
+
+<http://localhost:8080/source/39> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/38> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/38> <http://schema.org/sameAs> <http://localhost:8080/source/39> .
+
+<http://localhost:8080/source/39> <http://schema.org/sameAs> <http://localhost:8080/source/38> .
+<http://localhost:8080/source/38> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/39> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/41> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/40> <http://schema.org/sameAs> <http://localhost:8080/source/41> .
+<http://localhost:8080/source/40> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/41> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/41> <http://schema.org/sameAs> <http://localhost:8080/source/40> .
+<http://localhost:8080/source/40> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/42> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/42> <http://schema.org/sameAs> <http://localhost:8080/source/43> .
+<http://localhost:8080/source/43> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/42> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/43> <http://schema.org/sameAs> <http://localhost:8080/source/42> .
+<http://localhost:8080/source/43> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/45> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/44> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/44> <http://schema.org/sameAs> <http://localhost:8080/source/45> .
+
+<http://localhost:8080/source/45> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/44> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/45> <http://schema.org/sameAs> <http://localhost:8080/source/44> .
+
+<http://localhost:8080/source/47> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/46> <http://schema.org/sameAs> <http://localhost:8080/source/47> .
+<http://localhost:8080/source/46> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+
+<http://localhost:8080/source/47> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/46> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Map> .
+<http://localhost:8080/source/47> <http://schema.org/sameAs> <http://localhost:8080/source/46> .
+
