@@ -20,4 +20,4 @@ java -cp "postgresql-42.2.5.jre7.jar;karma-offline-0.0.1-SNAPSHOT-shaded.jar" ed
 
 Once you have already set up, the next time you just navigate to ```\Web-Karma-master\karma-offline\target.``` , and do step 5) and 6).
 
-Note: out.ttl is the real output from this instruction.
+Note: You must replace the table name ```<map_table_name```, ```<geom_table_name>```, ```<same_as_table_name>```, ```contain_table_name``` in the models ttl file in accordance with your [config file](https://github.com/usc-isi-i2/linked-maps/blob/master/1%20-%20Line%20Segmentation%20(Python%2BPostgis)/config.json)
