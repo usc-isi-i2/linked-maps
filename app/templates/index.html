@@ -14,8 +14,10 @@
         <hr>
         <div id="google-map-canvas" class="col-md-12 well" style="height:500px"></div>
         <script type="text/javascript">
+          var myData = {{ data|safe }} ;
           window.onload = function() {
             wkt_map.init();
+            wkt_map.wktPlot(myData);
           };
         </script>
     </body>
