@@ -4,9 +4,9 @@ import sys
 
 if __name__ == "__main__":
 
-    if len(sys.argv) == 4 and sys.argv[1] == '-a':
-        path_to_shp     = sys.argv[2]
-        path_to_config  = sys.argv[3]
+    if len(sys.argv) == 3:
+        path_to_shp     = sys.argv[1]
+        path_to_config  = sys.argv[2]
         print("Path to config file: %s" % path_to_config)
         print("Path to shape files: %s" % path_to_shp)
         segment = Segment(path_to_config, is_reset = True)

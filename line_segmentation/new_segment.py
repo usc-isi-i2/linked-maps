@@ -9,7 +9,7 @@ COLOR_GREEN = "\033[32m"
 COLOR_CYAN = "\033[36m"
 COLOR_YELLOW = "\033[33m"
 VERBOSE = True
-VERBOSE_PRINT_SQL = True
+VERBOSE_PRINT_SQL = False
 
 def VPRINT(pstring):
     global VERBOSE
@@ -128,6 +128,7 @@ class Segment:
         for i in range(total_feature_count_in_map):
             feature = layer.GetFeature(i)
             # name = feature.GetField("NAME").decode("Latin-1")
+            # TODO: optimize
             wkt = feature.GetGeometryRef().ExportToWkt()
             cursor.execute(SQL_2, (AsIs(table_name), wkt, self.SRID))
             # VPRINTSQL(str(cursor.query))
