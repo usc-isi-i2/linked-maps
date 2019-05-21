@@ -1,10 +1,6 @@
 # Automated Line Segmentation
 
-## How to run the program
-The abstract idea of line segmentation shall be described in section 2 of [this paper](http://usc-isi-i2.github.io/papers/lin18.pdf) for more info. 
-
 To run this line segmentation program, we need to setup the environment.
-
 1. Install Python 2.7 and do
 ```
 pip install psycopg2 osgeo
@@ -14,18 +10,20 @@ pip install psycopg2 osgeo
 4. Create the Postgis extension on that database
 ```
  CREATE EXTENSION postgis;
- ```
- 5. Edit your config.json accordingly.
- 6. Run this command
- ```
- python main.py -a /path/to/shpfiles/ /path/to/config/file/
- ```
-This will run the line segmentation program in automatic mode, which will perform segmentation for all shapefiles in the folder. Alternatively, run 
 ```
-python main.py -m
-``` 
-This will run the line segmentation program manually. You will need to specify what do you want do by yourselves.
+5. Edit your config.json accordingly.
+6. Run this command
+```
+ python main.py <path_to_shapefiles> <path_to_config_file>
+```
+For example:  ```python main.py maps config.json```
 
-## Implementation Details
-<TODO>
- 
+
+When done, we can export the data from the PostgreSQL DB tables (Postgis) into ```csv``` tables.
+In the PostgreSQL shell, run each command of the following:
+```
+COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM contain) t) TO '/tmp/contain.csv';
+COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM geom) t) TO '/tmp/geom.csv';
+COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM sameas) t) TO '/tmp/sameas.csv';
+COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM map) t) TO '/tmp/map.csv';
+```
