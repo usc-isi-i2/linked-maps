@@ -6,6 +6,7 @@ sparql = SPARQLWrapper("http://localhost:3030/spatial_data/sparql")
 sparql.setReturnFormat(JSON)
 
 SPARQL_PREFIXES = """
+            prefix spatial: <http://jena.apache.org/spatial#>
             prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
             prefix schema: <http://schema.org/>
@@ -14,26 +15,25 @@ SPARQL_PREFIXES = """
             prefix wkt: <http://www.opengis.net/ont/geosparql#>
             """
 
-SPARQL_EXAMPLE = """
-            SELECT ?wkt
-            WHERE {
-              <http://localhost:8080/source/%s> schema:includesObject ?thing .
-              ?thing wkt:asWKT ?wkt ;
-            }
-            """
+def generate_query_by_sequence_string(sequence_string):
+    SPARQL_Q_EMB = ""
+    num_of_terms = len(sequence_string.split(','))
+    for uri_idx_counter, uri_idx in enumerate(sequence_string.split(',')):
+        if uri_idx_counter != 0:
+            SPARQL_Q_EMB += "|| "
+        SPARQL_Q_EMB += "?x = <http://isi.linkedmap.com/_%d> " % int(uri_idx)
+    SPARQL_Q_FULL = """
+    SELECT ?wkt
+    WHERE {
+       FILTER (%s)
+       ?x rdf:type schema:Map ;
+             schema:spatialCoverage [ schema:line ?wkt ] .
+    }
+    """ % SPARQL_Q_EMB
+    return SPARQL_Q_FULL
 
-@app.route("/")
-def home():
-    data = ['LINESTRING(34.79011521585437 32.11589598470496,34.78736863382312 32.06470337558891)', \
-            'LINESTRING(34.93019089944812 32.20192792321161,35.13618455179187 32.16705989986249)']
-    return render_template('index.html', data = data)
-
-@app.route("/sparqlex")
-def sparqlex():
-    map_id = "4"
-    if "id" in request.args:
-        map_id = request.args.get("id")
-    sparql.setQuery(SPARQL_PREFIXES + SPARQL_EXAMPLE % (map_id))
+def get_linestring_data_by_sparql(sparql_query_in_text):
+    sparql.setQuery(SPARQL_PREFIXES + sparql_query_in_text)
     results = sparql.query().convert()
     keys = results["results"]["bindings"][0].keys()
     int_results = results["results"]["bindings"]
@@ -42,7 +42,22 @@ def sparqlex():
         for k in int_results[i]:
             # TODO: compare int_results[i][k]['datatype'] == 'http://www.opengis.net/ont/geosparql#wktLiteral'
             linestring_data.append(int_results[i][k]['value'])
-    return render_template('index.html', data = linestring_data)
+    return linestring_data
+
+@app.route("/")
+def home():
+    SPARQL_Q = generate_query_by_sequence_string("1")
+    default_data = get_linestring_data_by_sparql(SPARQL_Q)
+    return render_template('index.html', data = default_data)
+
+@app.route("/sparqlex")
+def sparqlex():
+    segs_seq_str = "1"
+    if "seq_str" in request.args:
+        segs_seq_str = request.args.get("seq_str")
+    SPARQL_Q = generate_query_by_sequence_string(segs_seq_str)
+    linestr_data = get_linestring_data_by_sparql(SPARQL_Q)
+    return render_template('index.html', data = linestr_data)
 
 if __name__ == '__main__':
     app.run(host="localhost", port=5000, debug=True)

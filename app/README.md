@@ -5,7 +5,7 @@
 
 Run flask server
 ```
-python app/main.py
+python main.py
 ```
 
 Navigate to `http://localhost:5000/`
