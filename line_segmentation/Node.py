@@ -1,8 +1,38 @@
+"""
+This class is a part of line segmentation algorithm.
+This Node class is abstraction of nodes in segmentation tree.
+Each node contains the its name, metadata, and a "pointer" pointed the geometric it represents.
+Also, since it is a node in graph, it will contains its parents and children.
+This would increase the flexibility of changing the segmentation algorithm in the future.
+
+Author: Patavee Meemeng (meemeng@usc.edu)
+May 2019
+"""
+
 import json
 
 import osgeo.ogr
 import psycopg2
 from psycopg2.extensions import AsIs
+
+
+# wrapper function used to verify necessary information before doing intersect, union etc operation
+def verify(func):
+    def inner(*args, **kwargs):
+        if args[0].metadata != args[1].metadata:
+            print("ERROR: Metadata Mismatched")
+            return None
+
+        if args[0] == args[1]:
+            print("ERROR: Same Node")
+            return None
+
+        if args[0].name == args[1].name:
+            print("ERROR: Same Name")
+            return None
+        return func(*args, **kwargs)
+
+    return inner
 
 
 class Node:
@@ -16,22 +46,9 @@ class Node:
     def __repr__(self):
         return "name : {}, parent: {}, child: {}".format(self.name, self.parent.keys(), self.child.keys())
 
-    def intersect(self, other_node, new_name):
-        if self.metadata != other_node.metadata:
-            print("ERROR: Metadata Mismatched")
-            return None
-
-        if self == other_node:
-            print("ERROR: Same Node")
-            return None
-
-        if self.name == other_node.name:
-            print("ERROR: Same Name")
-            return None
-
+    @verify
+    def intersect(self, other_node, new_name, buff=0.0015):
         cur = self.metadata.connection.cursor()
-
-
         SQL = '''
             INSERT INTO %s (wkt, geom) 
             SELECT ST_ASTEXT(res.lr), lr
@@ -39,8 +56,8 @@ class Node:
                 SELECT ST_MULTI(ST_INTERSECTION(
                     l.geom, 
                     ST_INTERSECTION(
-                        st_buffer(l.geom, 0.0015), 
-                        st_buffer(r.geom, 0.0015))         
+                        st_buffer(l.geom, %s), 
+                        st_buffer(r.geom, %s))         
                 )) as lr
                 FROM 
                     (
@@ -60,6 +77,8 @@ class Node:
         '''
         cur.execute(SQL,
                     (AsIs(self.metadata.table_name),
+                     AsIs(buff),
+                     AsIs(buff),
                      AsIs(self.metadata.table_name),
                      AsIs(self.metadata.table_name),
                      AsIs(self.gid),
@@ -78,13 +97,111 @@ class Node:
 
         return new_node
 
+    @verify
+    def union(self, other_node, new_name, buff=0.0015):
+        cur = self.metadata.connection.cursor()
+        SQL = '''
+            INSERT INTO %s (wkt, geom) 
+            SELECT ST_ASTEXT(res.lr), lr
+            FROM(
+                SELECT ST_MULTI(ST_INTERSECTION(
+                    l.geom, 
+                    ST_UNION(
+                        st_buffer(l.geom, %s), 
+                        st_buffer(r.geom, %s))         
+                )) as lr
+                FROM 
+                    (
+                    SELECT geom
+                    FROM %s
+                    WHERE %s.gid = %s
+                    ) as l,
+                    (
+                    SELECT geom
+                    FROM %s
+                    WHERE %s.gid = %s
+                    ) as r
+            ) res
+            where ST_geometrytype(res.lr) = 'ST_MultiLineString'
+            RETURNING gid
 
-    def union(self, other_node):
-        pass
+        '''
+        cur.execute(SQL,
+                    (AsIs(self.metadata.table_name),
+                     AsIs(buff),
+                     AsIs(buff),
+                     AsIs(self.metadata.table_name),
+                     AsIs(self.metadata.table_name),
+                     AsIs(self.gid),
+                     AsIs(self.metadata.table_name),
+                     AsIs(self.metadata.table_name),
+                     AsIs(other_node.gid),
+                     ))
 
-    def minus(self, other_node):
-        pass
+        new_gid = cur.fetchone()
+        new_node = Node(self.metadata, new_gid, new_name)
 
+        # Note: Union Operation shall not result in any graph relations
+
+        # self.child[new_name] = new_node
+        # other_node.child[new_name] = new_node
+        # new_node.parent[self.name] = self
+        # new_node.parent[other_node.name] = other_node
+
+        return new_node
+
+    @verify
+    def minus(self, other_node, new_name, buff=0.0015):
+        cur = self.metadata.connection.cursor()
+        SQL = '''
+            INSERT INTO %s (wkt, geom) 
+            SELECT ST_ASTEXT(res.lr), lr
+            FROM(
+                SELECT ST_MULTI(ST_INTERSECTION(
+                    l.geom, 
+                    ST_DIFFERENCE(
+                        st_buffer(l.geom, %s), 
+                        st_buffer(r.geom, %s))         
+                )) as lr
+                FROM 
+                    (
+                    SELECT geom
+                    FROM %s
+                    WHERE %s.gid = %s
+                    ) as l,
+                    (
+                    SELECT geom
+                    FROM %s
+                    WHERE %s.gid = %s
+                    ) as r
+            ) res
+            where ST_geometrytype(res.lr) = 'ST_MultiLineString'
+            RETURNING gid
+
+        '''
+        cur.execute(SQL,
+                    (AsIs(self.metadata.table_name),
+                     AsIs(buff),
+                     AsIs(buff),
+                     AsIs(self.metadata.table_name),
+                     AsIs(self.metadata.table_name),
+                     AsIs(self.gid),
+                     AsIs(self.metadata.table_name),
+                     AsIs(self.metadata.table_name),
+                     AsIs(other_node.gid),
+                     ))
+
+        new_gid = cur.fetchone()
+        new_node = Node(self.metadata, new_gid, new_name)
+
+        self.child[new_name] = new_node
+        new_node.parent[self.name] = self
+
+        # Note: New node should not be child of other_node (because of minus operation)
+        # other_node.child[new_name] = new_node
+        # new_node.parent[other_node.name] = other_node
+
+        return new_node
 
     @classmethod
     def from_shapefile(cls, path, metadata, name):
@@ -160,15 +277,34 @@ class Metadata:
 
 if __name__ == "__main__":
     # test
-    
+
     config_path = r"C:\Users\Wii\Google Drive USC\usc\ISI\7maps_clip\clipped\config2.json"
     meta = Metadata(config_path)
 
+    print("====create new nodes====")
     node54 = Node.from_shapefile(r"C:\Users\Wii\Google Drive USC\usc\ISI\7maps_clip\clipped\1954c.shp", meta, "1954")
     node62 = Node.from_shapefile(r"C:\Users\Wii\Google Drive USC\usc\ISI\7maps_clip\clipped\1962c.shp", meta, "1962")
-
-    new_node = node54.intersect(node62, "1954-1962")
     print("node 1954", node54)
-    print("node 1962", node54)
-    print("new node", new_node)
+    print("node 1962", node62)
 
+    print("====test intersection====")
+    new_intersect = node54.intersect(node62, "1954,1962-i")
+    print("new node intersection", new_intersect)
+    print("node 1954", node54)
+    print("node 1962", node62)
+
+    print("====test union====")
+    new_union = node54.union(node62, "1954,1962-u")
+    print("new node union", new_union)
+
+    print("====test minus====")
+    new_minus = node54.minus(node62, "1954,1962-m")
+    print("new node minus", new_minus)
+    print("node 1954", node54)
+    print("node 1962", node62)
+
+    print("====test error checking====")
+    node54.intersect(node54)
+
+    node62.metadata = None
+    node54.intersect(node62)
