@@ -1,8 +1,8 @@
 """
 This class is a part of line segmentation algorithm.
 This Node class is abstraction of nodes in segmentation tree.
-Each node contains the its name, metadata, and a "pointer" pointed the geometric it represents.
-Also, since it is a node in graph, it will contains its parents and children.
+Each node contains its name, metadata, and a "pointer" pointed the geometric it represents.
+Also, since it is a node in graph, it will contain its parents and children.
 This would increase the flexibility of changing the segmentation algorithm in the future.
 
 Author: Patavee Meemeng (meemeng@usc.edu)
