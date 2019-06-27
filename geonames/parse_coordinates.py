@@ -16,6 +16,6 @@ def parseCoordinates(line):
         coordinate = re.sub('[a-zA-Z"()]', '', coordinate)
         coordinate = coordinate.strip()
         coordinate = coordinate.split(' ')
-        coordinate = {'lat':float(coordinate[0]),'lng':float(coordinate[1])}
+        coordinate = {'lat':float(coordinate[1]),'lng':float(coordinate[0])}
         coordinates[i] = coordinate
     return coordinates
