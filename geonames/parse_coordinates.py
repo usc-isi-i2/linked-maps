@@ -9,7 +9,8 @@ def openCoordinates(fileName):
 def parseCoordinates(line):
     coordinates = line.split(',')
     for coordinate in coordinates:
-        coordinate = coordinate.translate(None,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"(,)')
+        coordinate = coordinate.translate(None,'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"()')
         coordinate = coordinate.strip()
         coordinate = coordinate.split(' ')
+        coordinate = {'lat':float(coordinate[0]),'lng':float(coordinate[1])}
     return coordinates
