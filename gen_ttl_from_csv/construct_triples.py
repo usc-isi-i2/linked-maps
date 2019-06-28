@@ -29,7 +29,7 @@ class LinkedMapGraph:
     self.dt.bind('prov', PROV)
     self.dt.bind('dcterms', DCTERMS)
 
-  def add_geo_feature_node(self, segment_id, segment_name, segment_gid, is_leaf):
+  def add_geo_feature_node(self, segment_id, segment_name, segment_gid):
     ''' Add a map to the graph '''
     global g_gid_to_wkt
     # don't construct a blank node
@@ -46,9 +46,6 @@ class LinkedMapGraph:
     self.dt.add((seg_feat_uri, GEO['hasGeometry'], seg_geo_uri))
     d_now = datetime.today()
     self.dt.add((seg_feat_uri, DCTERMS['created'], Literal(d_now.isoformat(), datatype=XSD.dateTime)))
-    # TODO: remove this
-    if True == is_leaf:
-      self.dt.add((seg_feat_uri, LMG['isLeaf'], Literal(True, datatype=XSD.boolean)))
     # --dcterms:date--> LITERAL^^xsd:dateTime
     #####################
     # TODO: fix
@@ -130,8 +127,7 @@ def main():
     seg_id = temp_dict_in['id']
     seg_line_name = temp_dict_in['line_name']
     seg_gid = temp_dict_in['gid']
-    seg_is_leaf = temp_dict_in['isleaf']
-    lnkd_mp_grph.add_geo_feature_node(seg_id, seg_line_name, seg_gid, seg_is_leaf)
+    lnkd_mp_grph.add_geo_feature_node(seg_id, seg_line_name, seg_gid)
 
   # read file: contain.csv
   read_file = open(f'{args.tables_dir}/contain.csv', 'r')
