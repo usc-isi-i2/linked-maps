@@ -12,17 +12,14 @@
           <a href="/">Home</a>  
         </div>
         <hr>
-        <!-- TODO: add form: 1. text field 2.submit button -- seq_str="text-field" and call POST method? generate view -->
         <form name="sparqlex" action="/sparqlex" method="GET" autocomplete="off">
           <label for="seq_str" class="sr-only">Which node ids would you like to query?</label></br>
           <input class="form-control" type="text" name="seq_str"> </br>
           <button type="submit" id="sbmtbtn" class="btn btn-lg btn-primary btn-block" type="button">Submit</button>
         </form>
         <p><u>Here are some examples:</u></br>
-          '<b style='color: red;'>1</b>' for <b>A</b>; '<b style='color: red;'>2</b>' for <b>B</b>; 
-          '<b style='color: red;'>3</b>' for <b>A∩B</b>; '<b style='color: red;'>4</b>' for <b>B∩A</b>; 
-          '<b style='color: red;'>5</b>' for <b>A\(A∩B)</b>; '<b style='color: red;'>6</b>' for <b>B\(B∩A)</b>; 
-          '<b style='color: red;'>3,5</b>' for <b>[A∩B] ∪ [A\(A∩B)]</b>
+          '<b style='color: red;'>1980</b>' for <b>A</b>; '<b style='color: red;'>2000</b>' for <b>B</b>; 
+          '<b style='color: red;'>1990</b>' for <b>C</b>; '<b style='color: red;'>1980, 2000</b>' for <b>A∩B</b>
         </p>
         <hr>
         <div id="google-map-canvas" class="col-md-12 well" style="height:500px"></div>
