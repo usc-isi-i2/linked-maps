@@ -1,9 +1,5 @@
 import urllib
 import json
-def getOSMData(coordinates = [{'lat':0,'lng':0}], key = '"route"="railway"'):
-    bbox = createBBox(coordinates)
-    start_data = queryResult(bbox['start'],key)
-    end_data = queryResult(bbox['end'],key)
 
 def queryResult(query_box = {'s':0,'n':0,'w':0,'e':0}, query_key = 'route'):
     #http://overpass-api.de/api/interpreter?data=[out:json];way["railway"](41.5429254269,-122.000388261,41.7613897871,-121.688332858);out body;
@@ -24,6 +20,13 @@ def createBBox(coordinates = [{'lat':0,'lng':0}], buffer = 0.01):
     bbox['bound'] = {'s':min(lat),'n':max(lat),'w':min(lng),'e':max(lng)}
     return bbox
     
+def getOSMData(coordinates = [{'lat':0,'lng':0}], key = '"route"="railway"', method = 'bound'):
+    bbox = createBBox(coordinates)
+    #start_data = queryResult(bbox['start'],key)
+    #end_data = queryResult(bbox['end'],key)
+    #bound_data = queryResult(bbox['bound'],key)
+    return queryResult(bbox['bound'],key)
+
 def printOSMData(osm_Data):
     for route in osm_Data:
         print (json.dumps(route['tags']))
