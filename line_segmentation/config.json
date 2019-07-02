@@ -1,6 +1,6 @@
 {
     "dbname": "linkedmap",
-    "user": "baselshbita",
+    "user": "vasujain",
     "host": "localhost",
     "map_table_name": "map",
     "same_as_table_name": "sameas",
