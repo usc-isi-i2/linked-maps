@@ -1,5 +1,5 @@
 {
-    "dbname": "linkedmap",
+    "dbname": "linkedmaps",
     "user": "vasujain",
     "host": "localhost",
     "map_table_name": "map",
