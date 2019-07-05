@@ -2,7 +2,7 @@ import json
 import random
 from parse_coordinates import openGeom,parseCoordinates
 from geonames import getGeonameData,getGeonamesData
-from osm import getOSMData
+from osm import getOSMData,printOSMData
 
 def generateRandomCoordinate(north=90.0,south=-90.0,east=180.0,west=-180.0):
     coordinate = {'lat':random.uniform(north,south),'lng':random.uniform(west,east)}
@@ -18,7 +18,7 @@ def testGeonames(segments):
         print len(segment['wkt'])
         print getGeonamesData(segment['wkt'])
 
-def testOSM(segments):
+def freqtestOSM(segments):
     railroad_tags = []
     railroad_names = {}
     print(len(segments))
@@ -35,4 +35,9 @@ def testOSM(segments):
     print(railroad_names) 
     print(railroad_tags)
 
-segments = openGeom("geom.csv")
+def testOSM(segment):
+    printOSMData(getOSMData(segment['wkt']))
+
+segments = openGeom("csv7/geom.csv")
+for segment in segments:
+    testOSM(segment)
