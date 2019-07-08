@@ -7,11 +7,15 @@ def queryResult(query_box = {'s':0,'n':0,'w':0,'e':0}, query_key = 'route'):
     url_base = "http://overpass-api.de/api/interpreter?data=[out:json];"
     url = url_base + query
     response = urllib.urlopen(url)
-    json_data = response.read()
-    osm_data = json.loads(json_data)
-    return osm_data['elements']
+    try:
+        json_data = response.read()
+        osm_data = json.loads(json_data)
+        return osm_data['elements']
+    except ValueError as _:
+        print("ValueError")
+        return {}
 
-def createBBox(coordinates = [{'lat':0,'lng':0}], buffer = 0.001):
+def createBBox(coordinates = [{'lat':0,'lng':0}], buffer = 0.0001):
     lat = [coord['lat'] for coord in coordinates]
     lng = [coord['lng'] for coord in coordinates]
     bbox = {}
@@ -49,9 +53,10 @@ def intersectionOSM(osm_data = []):
 def getOSMData(coordinates = [{'lat':0,'lng':0}], key = '"route"="railway"', method = 'bound'):
     bbox = createBBox(coordinates)
     start_data = queryResult(bbox['start'],key)
+    print bbox['start']
     print bbox['end']
     end_data = queryResult(bbox['end'],key)
-    bound_data = queryResult(bbox['bound'],key)
+    #bound_data = queryResult(bbox['bound'],key)
     return unionOSM([start_data,end_data])
     #return queryResult(bbox['bound'],key)
 
