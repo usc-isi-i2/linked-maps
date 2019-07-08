@@ -11,12 +11,9 @@ def generateRandomCoordinate(north=90.0,south=-90.0,east=180.0,west=-180.0):
 def generateRandomCoordinates(N=10,north=90.0,south=-90.0,east=180.0,west=-180.0):
     coordinates = [ generateRandomCoordinate(north,south,east,west) for _ in range(N)]
     return coordinates
-    
-def testGeonames(segments):
-    for segment in segments:        
-        print segment
-        print len(segment['wkt'])
-        print getGeonamesData(segment['wkt'])
+        
+def testGeonames(segment):
+    print getGeonamesData(segment['wkt'])
 
 def freqtestOSM(segments):
     railroad_tags = []
@@ -38,6 +35,14 @@ def freqtestOSM(segments):
 def testOSM(segment):
     printOSMData(getOSMData(segment['wkt']))
 
+def testSegment(segment):
+    print segment['gid']
+    print len(segment['wkt'])
+    
 segments = openGeom("csv7/geom.csv")
-for segment in segments:
+print len(segments.keys())
+for gid in segments:
+    segment = segments[gid] 
+    testSegment(segment)
+    testGeonames(segment)
     testOSM(segment)
