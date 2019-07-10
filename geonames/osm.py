@@ -2,9 +2,11 @@ import random
 import urllib
 import json
 
-def queryResult(query_box = {'s':0,'n':0,'w':0,'e':0}, query_key = 'route'):
+def queryResult(query_box = {'s':0,'n':0,'w':0,'e':0}, query_key = ""):
     #http://overpass-api.de/api/interpreter?data=[out:json];way["railway"](41.5429254269,-122.000388261,41.7613897871,-121.688332858);out body;
-    query = "relation[{key}]({s},{w},{n},{e});out body;".format(key=query_key,s=query_box['s'],n=query_box['n'],w=query_box['w'],e=query_box['e'])
+    if query_key:
+        query_key = "[{key}]".format(key=query_key)
+    query = "relation{key}({s},{w},{n},{e});out body;".format(key=query_key,s=query_box['s'],n=query_box['n'],w=query_box['w'],e=query_box['e'])
     url_base = "http://overpass-api.de/api/interpreter?data=[out:json];"
     url = url_base + query
     response = urllib.urlopen(url)
@@ -54,7 +56,7 @@ def intersectionOSM(osm_data = []):
     else:
         return {}
 
-def getOSMData(coordinates = [{'lat':0,'lng':0}], key = '"route"="railway"', samples = 100):
+def getOSMData(coordinates = [{'lat':0,'lng':0}], key = '', samples = 10):
     last_index = len(coordinates) -1
     bbox = createBBox(coordinates,None)
     print bbox
