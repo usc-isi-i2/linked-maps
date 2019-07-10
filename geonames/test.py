@@ -13,7 +13,7 @@ def generateRandomCoordinates(N=10,north=90.0,south=-90.0,east=180.0,west=-180.0
     return coordinates
         
 def testGeonames(segment):
-    print getGeonamesData(segment['wkt'])
+    print getGeonameData(segment['wkt'][1])
 
 def freqtestOSM(segments):
     railroad_tags = []
@@ -38,11 +38,9 @@ def testOSM(segment):
 def testSegment(segment):
     print segment['gid']
     print len(segment['wkt'])
-    
+    #testGeonames(segment)
+    testOSM(segment)
+
 segments = openGeom("csv7/geom.csv")
 print len(segments.keys())
-for gid in segments:
-    segment = segments[gid] 
-    testSegment(segment)
-    testGeonames(segment)
-    testOSM(segment)
+testSegment(segments[1])
