@@ -1,3 +1,4 @@
+import random
 import urllib
 import json
 
@@ -12,16 +13,19 @@ def queryResult(query_box = {'s':0,'n':0,'w':0,'e':0}, query_key = 'route'):
         osm_data = json.loads(json_data)
         return osm_data['elements']
     except ValueError as _:
+        print(query_box)
         print("ValueError")
-        return {}
+        return []
 
-def createBBox(coordinates = [{'lat':0,'lng':0}], buffer = 0.0001):
-    lat = [coord['lat'] for coord in coordinates]
-    lng = [coord['lng'] for coord in coordinates]
-    bbox = {}
-    bbox['start'] = {'s':lat[0]-buffer,'n':lat[0]+buffer,'w':lng[0]-buffer,'e':lng[0]+buffer}
-    bbox['end'] = {'s':lat[-1]-buffer,'n':lat[-1]+buffer,'w':lng[-1]-buffer,'e':lng[-1]+buffer}
-    bbox['bound'] = {'s':min(lat),'n':max(lat),'w':min(lng),'e':max(lng)}
+def createBBox(coordinates = [{'lat':0,'lng':0}],index = None,buffer = 0.001):
+    if index is None:
+        lat = [coord['lat'] for coord in coordinates]
+        lng = [coord['lng'] for coord in coordinates]
+        bbox = {'s':min(lat),'n':max(lat),'w':min(lng),'e':max(lng)}
+    else:
+        lat = coordinates[index]['lat']
+        lng = coordinates[index]['lng']
+        bbox = {'s':lat-buffer,'n':lat+buffer,'w':lng-buffer,'e':lng + buffer}
     return bbox
 
 def unionOSM(osm_data = []):
@@ -50,17 +54,24 @@ def intersectionOSM(osm_data = []):
     else:
         return {}
 
-def getOSMData(coordinates = [{'lat':0,'lng':0}], key = '"route"="railway"', method = 'bound'):
-    bbox = createBBox(coordinates)
-    start_data = queryResult(bbox['start'],key)
-    print bbox['start']
-    print bbox['end']
-    end_data = queryResult(bbox['end'],key)
-    #bound_data = queryResult(bbox['bound'],key)
-    return unionOSM([start_data,end_data])
-    #return queryResult(bbox['bound'],key)
+def getOSMData(coordinates = [{'lat':0,'lng':0}], key = '"route"="railway"', samples = 100):
+    last_index = len(coordinates) -1
+    bbox = createBBox(coordinates,None)
+    print bbox
+    bound_data = queryResult(bbox,key)
+    data_dict = {element['id']:element for element in bound_data}
+    counts = {element['id']:0 for element in bound_data}
+    for _ in range(samples):
+        sample_bbox = createBBox(coordinates, random.randint(0,last_index))
+        sample_data = queryResult(sample_bbox,key)
+        for element in sample_data:
+            counts[element['id']]+=1
+    ids = sorted(counts, key=counts.get, reverse=True)
+    print(counts)
+    result = [data_dict[id] for id in ids]
+    return result
 
 def printOSMData(osm_data):
-    for route in osm_data.values():
+    for route in osm_data:
         print (json.dumps(route['tags']))
 
