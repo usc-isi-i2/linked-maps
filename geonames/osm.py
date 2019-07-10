@@ -69,11 +69,13 @@ def getOSMData(coordinates = [{'lat':0,'lng':0}], key = '', samples = 10):
         for element in sample_data:
             counts[element['id']]+=1
     ids = sorted(counts, key=counts.get, reverse=True)
-    print(counts)
+    for id in ids:
+        data_dict[id]['count'] = counts[id]
+        del data_dict[id]['members']
     result = [data_dict[id] for id in ids]
     return result
 
 def printOSMData(osm_data):
     for route in osm_data:
-        print (json.dumps(route['tags']))
+        print(json.dumps(route))
 
