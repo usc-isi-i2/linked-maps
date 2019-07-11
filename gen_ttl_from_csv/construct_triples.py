@@ -54,13 +54,13 @@ class LinkedMapGraph:
 
 try:
     gid_to_wkt = dict()
-    read_WKT_literals("test_lm/geom.csv")
+    read_WKT_literals("/tmp/geom.csv")
 
     # initialize graph
     lnkd_mp_grph = LinkedMapGraph()
     
     # read file: map.csv
-    read_file = open("test_lm/map.csv", "r")
+    read_file = open("/tmp/map.csv", "r")
     for line_r in read_file:
       temp_dict_in = json.loads(line_r)
       map_id = temp_dict_in['id']
@@ -70,7 +70,7 @@ try:
       lnkd_mp_grph.add_map(map_id, map_line_name, map_gid, map_is_leaf)
 
     # read file: contain.csv
-    read_file = open("test_lm/contain.csv", "r")
+    read_file = open("/tmp/contain.csv", "r")
     for line_r in read_file:
       temp_dict_in = json.loads(line_r)
       map_par_id = temp_dict_in['par_id']
@@ -78,7 +78,7 @@ try:
       lnkd_mp_grph.add_map_child_to_parent(map_par_id, map_chi_id)
 
     # read file: sameas.csv
-    read_file = open("test_lm/sameas.csv", "r")
+    read_file = open("/tmp/sameas.csv", "r")
     for line_r in read_file:
       temp_dict_in = json.loads(line_r)
       map_1_id = temp_dict_in['id1']
