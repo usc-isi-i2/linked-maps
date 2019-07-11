@@ -19,11 +19,11 @@ RUN add-apt-repository -y ppa:ubuntugis/ppa && \
 # install postgresql and postgis
 RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt xenial-pgdg main" >> /etc/apt/sources.list' &&\
     wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | apt-key add - &&\
-    apt update &&\
-    apt install -y postgresql-11 &&\
-    apt install -y postgresql-11-postgis-2.4 &&\ 
-    apt install -y postgresql-11-postgis-scripts &&\
-    apt install -y postgis
+    apt-get update &&\
+    apt-get install -y postgresql-11 &&\
+    apt-get install -y postgresql-11-postgis-2.5 &&\ 
+    apt-get install -y postgresql-11-postgis-scripts &&\
+    apt-get install -y postgis
 
 # update pip and install rdflib
 RUN python3.5 -m pip install pip --upgrade &&\
@@ -39,9 +39,9 @@ ENV NAME LinkedMaps
 COPY ./line_segmentation /linked-maps
 USER postgres
 RUN /etc/init.d/postgresql start &&\
-    createdb linkpedmaps &&\
+    createdb linkedmaps &&\
     psql linkedmaps -c "CREATE EXTENSION Postgis;" &&\
     python3 main.py maps config.json &&\
-    psql linkedmaps -c psql LinkedMaps" COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM contain) t) TO '/tmp/contain.csv';COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM geom) t) TO '/tmp/geom.csv';COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM sameas) t) TO '/tmp/sameas.csv';COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM map) t) TO '/tmp/map.csv';"
+    psql linkedmaps -c " COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM contain) t) TO '/linked-maps/csvs/contain.csv';COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM geom) t) TO '/linked-maps/csvs/geom.csv';COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM sameas) t) TO '/linked-maps/csvs/sameas.csv';COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM map) t) TO '/linked-maps/csvs/map.csv';"
 
 CMD ["echo", "done"]
