@@ -27,7 +27,7 @@ RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt xenial-pgdg main" >
 
 # update pip and install rdflib
 RUN python3.5 -m pip install pip --upgrade &&\
-    pip install setuptools rdflib psycopg2
+    pip install setuptools rdflib psycopg2-binary
 
 # Make port 5432 available to the world outside this container
 EXPOSE 5432
