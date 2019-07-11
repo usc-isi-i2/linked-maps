@@ -40,13 +40,3 @@ COPY ./line_segmentation /linked-maps
 COPY ./gen_ttl_from_csv/construct_triples.py /linked-maps
 
 USER postgres
-RUN /etc/init.d/postgresql start &&\
-    createdb linkedmaps &&\
-    psql linkedmaps -c "CREATE EXTENSION Postgis;" &&\
-    python3 main.py maps config.json &&\
-    psql linkedmaps -c " COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM contain) t) TO '/tmp/contain.csv';COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM geom) t) TO '/tmp/geom.csv';COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM sameas) t) TO '/tmp/sameas.csv';COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM map) t) TO '/tmp/map.csv';" &&\
-    cat /tmp/*.csv
-
-USER root
-RUN python3 construct_triples.py &&\
-    cat lnkd_mp_grph.ttl
