@@ -29,12 +29,13 @@ RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt xenial-pgdg main" >
 RUN python3.5 -m pip install pip --upgrade &&\
     pip install setuptools rdflib psycopg2
 
-# Make port 80 available to the world outside this container
-EXPOSE 3030 5432
+# Make port 5432 available to the world outside this container
+EXPOSE 5432
 
 # Define environment variable
 ENV NAME LinkedMaps
 
+# COPY line_segmentation to linked-maps
 COPY ./line_segmentation /linked-maps
 USER postgres
 RUN /etc/init.d/postgresql start &&\
@@ -43,4 +44,4 @@ RUN /etc/init.d/postgresql start &&\
     python3 main.py maps config.json &&\
     psql linkedmaps -c psql LinkedMaps" COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM contain) t) TO '/tmp/contain.csv';COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM geom) t) TO '/tmp/geom.csv';COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM sameas) t) TO '/tmp/sameas.csv';COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM map) t) TO '/tmp/map.csv';"
 
-CMD ["echo", "whoami"]
+CMD ["echo", "done"]
