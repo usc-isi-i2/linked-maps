@@ -71,8 +71,17 @@ def getOSMData(coordinates = [{'lat':0,'lng':0}], key = '', samples = 10):
     ids = sorted(counts, key=counts.get, reverse=True)
     for id in ids:
         data_dict[id]['count'] = counts[id]
-        del data_dict[id]['members']
+        data_dict[id]['members'] = triplify(data_dict[id]['members'])
     result = [data_dict[id] for id in ids]
+    return result
+def getURI(osm_member):
+    return "http://linkedgeodata.org/triplify/" + osm_member['type'] + str(osm_member['ref'])
+
+def triplify(osm_members):
+    result = []
+    for member in osm_members:
+        member['uri'] = getURI(member)
+        result.append(member)
     return result
 
 def printOSMData(osm_data):
