@@ -33,7 +33,7 @@ def freqtestOSM(segments):
     print(railroad_tags)
 
 def testOSM(segment):
-    printOSMData(getOSMData(segment['wkt']))
+    printOSMData(addURIs(getOSMData(segment['wkt'])))
 
 def testSegment(segment):
     print segment['gid']
