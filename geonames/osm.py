@@ -81,6 +81,11 @@ def triplify(osm_member):
     osm_member['uri'] = getURI(osm_member)
     return osm_member
 
+def addURIs(osm_data):
+    for i in range(len(osm_data)):
+        osm_data[i]['members'] = triplify(osm_data[i]['members'])
+    return osm_data
+    
 def printOSMData(osm_data):
     for route in osm_data:
         print(json.dumps(route))
