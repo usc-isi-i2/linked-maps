@@ -86,9 +86,9 @@ def addURIs(osm_data):
         osm_data[i]['members'] = [triplify(member) for member in osm_data[i]['members']]
     return osm_data
     
-    '''
-    We can verify this using this query on this sparql endpoints http://linkedgeodata.org/sparql
-    '''
+'''
+We can verify this using this query on this sparql endpoints http://linkedgeodata.org/sparql
+'''
 
 def printOSMData(osm_data):
     for route in osm_data:
