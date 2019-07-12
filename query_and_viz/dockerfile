@@ -1,0 +1,12 @@
+FROM stain/jena-fuseki
+LABEL Author="Vasu Jain" Email="vasu.jain@isi.edu"
+
+WORKDIR /jena-fuseki
+
+RUN mkdir /jena-fuseki/lib
+COPY ./pre_jena/jts-1.14.jar /jena-fuseki/lib
+COPY ./pre_jena/spatial_data.ttl /jena-fuseki/run/configuration
+
+EXPOSE 3030
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["/jena-fuseki/fuseki-server"]
