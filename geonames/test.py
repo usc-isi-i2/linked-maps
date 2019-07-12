@@ -2,7 +2,7 @@ import json
 import random
 from parse_coordinates import openGeom,parseCoordinates
 from geonames import getGeonameData,getGeonamesData
-from osm import getOSMData,printOSMData
+from osm import getOSMData,printOSMData,addURIs
 
 def generateRandomCoordinate(north=90.0,south=-90.0,east=180.0,west=-180.0):
     coordinate = {'lat':random.uniform(north,south),'lng':random.uniform(west,east)}
