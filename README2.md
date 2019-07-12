@@ -39,12 +39,13 @@ Now run the following commands from inside the container.
 6. `exit`
 
 Once having exit the container. RUN the following commands from host bash
-
+- `docker cp linkedmaps:/linked-maps/lnkd_mp_grph.ttl ./lnkd_mp_grph.ttl`
 - `docker build -t jena-fuseki ./query_and_viz/`
 - `docker run -p 3030:3030 -e ADMIN_PASSWORD=1234 jena-fuseki`
 
 Open your browser and enter `http://localhost:3030/`
 Manage datasets -> add new dataset -> create dataset
-Select "upload data" on the dataset you created, and upload the RDF (`ttl`) files
+Select "upload data" on the dataset you created, and 
+upload the `lnkd_mp_grph.ttl` found in the current working directory
 Now you can run SPARQL queries under "dataset" section
 
