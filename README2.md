@@ -30,6 +30,21 @@ Now run the following commands from inside the container.
 
 Once having exit the container. RUN the following commands from host bash
 
-- `docker exec -it --user root linkedmaps /bin/bash "python3 construct_triples.py"`
+- `docker exec -it --user root linkedmaps /bin/bash `
 
+This will take you inside the container as root user.
+Now run the following commands from inside the container.
+
+5. `"python3 construct_triples.py"`
+6. `exit`
+
+Once having exit the container. RUN the following commands from host bash
+
+- `docker build -t jena-fuseki ./query_and_viz/`
+- `docker run -p 3030:3030 -e ADMIN_PASSWORD=1234 jena-fuseki`
+
+Open your browser and enter `http://localhost:3030/`
+Manage datasets -> add new dataset -> create dataset
+Select "upload data" on the dataset you created, and upload the RDF (`ttl`) files
+Now you can run SPARQL queries under "dataset" section
 
