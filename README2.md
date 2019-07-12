@@ -16,7 +16,7 @@ The process is separated into three steps:
 Go to bash and execute the following commands.
 - `git clone https://github.com/usc-isi-i2/linked-maps.git`
 - `cd linked-maps`
-- `docker build -t linkedmaps:your_tag`
+- `docker build -t linkedmaps:your_tag .`
 - `docker run -it -d --name linkedmaps linkedmaps:your_tag /bin/bash`
 - `docker exec -it linkedmaps /bin/bash`
     
