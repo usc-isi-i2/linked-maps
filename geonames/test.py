@@ -15,23 +15,6 @@ def generateRandomCoordinates(N=10,north=90.0,south=-90.0,east=180.0,west=-180.0
 def testGeonames(segment):
     print getGeonameData(segment['wkt'][1])
 
-def freqtestOSM(segments):
-    railroad_tags = []
-    railroad_names = {}
-    print(len(segments))
-    for segment in segments:
-        coordinates = segments[segment]['wkt']
-        osm_data = getOSMData(coordinates)
-        for element in osm_data:
-            route = element['tags']
-            if route['name'] in railroad_names:
-                railroad_names[route['name']] += 1
-            else:
-                railroad_tags.append(route)
-                railroad_names[route['name']] = 1
-    print(railroad_names) 
-    print(railroad_tags)
-
 def testOSM(segment):
     printOSMData(addURIs(getOSMData(segment['wkt'])))
 
