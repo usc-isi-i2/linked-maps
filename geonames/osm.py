@@ -6,7 +6,7 @@ def queryResult(query_box = {'s':0,'n':0,'w':0,'e':0}, query_key = ""):
     #http://overpass-api.de/api/interpreter?data=[out:json];way["railway"](41.5429254269,-122.000388261,41.7613897871,-121.688332858);out body;
     if query_key:
         query_key = "[{key}]".format(key=query_key)
-    query = "relation{key}({s},{w},{n},{e});out body;".format(key=query_key,s=query_box['s'],n=query_box['n'],w=query_box['w'],e=query_box['e'])
+    query = "relation{key}({s},{w},{n},{e});out skel;".format(key=query_key,s=query_box['s'],n=query_box['n'],w=query_box['w'],e=query_box['e'])
     url_base = "http://overpass-api.de/api/interpreter?data=[out:json];"
     url = url_base + query
     response = urllib.urlopen(url)
@@ -83,7 +83,7 @@ def triplify(osm_member):
 
 def addURIs(osm_data):
     for i in range(len(osm_data)):
-        osm_data[i]['members'] = [triplify(member) for member in osm_data[i]['members']]
+        osm_data[i]['members'] = [getURI(member) for member in osm_data[i]['members']]
     return osm_data
     
 '''
@@ -92,8 +92,4 @@ We can verify this using this query on this sparql endpoints http://linkedgeodat
 
 def printOSMData(osm_data):
     for route in osm_data:
-        print(route['id'])
-        print(json.dumps(route['tags']))
-        for member in route['members']:
-            print(member['uri'])
-
+        print(json.dumps(route))
