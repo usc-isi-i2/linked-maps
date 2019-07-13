@@ -92,5 +92,8 @@ We can verify this using this query on this sparql endpoints http://linkedgeodat
 
 def printOSMData(osm_data):
     for route in osm_data:
-        print(json.dumps(route))
+        print(route['id'])
+        print(json.dumps(route['tags']))
+        for member in route['members']:
+            print(member['uri'])
 
