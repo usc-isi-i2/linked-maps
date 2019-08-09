@@ -162,7 +162,6 @@ class PostGISChannel:
             self.user               = config["user"]
             self.host               = config["host"]
             self.geom_table_name    = config["geom_table_name"]
-            self.contain_table_name = config["contain_table_name"]
             self.SRID               = config["SRID"]
         except LookupError:
             print("Invalid configuration file")
@@ -191,7 +190,7 @@ class PostGISChannel:
     def reset_all_tables(self):
         ''' Reset all tables (geom, map, contain). '''
 
-        sql_reset_all_tables = sqlstr_reset_all_tables(self.geom_table_name, self.contain_table_name, self.SRID)
+        sql_reset_all_tables = sqlstr_reset_all_tables(self.geom_table_name, self.SRID)
         cur = self.connection.cursor()
         cur.execute(sql_reset_all_tables)
         self.pgcprint(cur.query.decode())

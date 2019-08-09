@@ -3,6 +3,5 @@
     "user": "baselshbita",
     "host": "localhost",
     "geom_table_name": "geomerty",
-    "contain_table_name": "contain",
     "SRID": 4269
 }
