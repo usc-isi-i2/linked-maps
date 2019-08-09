@@ -1,19 +1,19 @@
 """
-This class is a part of line segmentation algorithm.
+This class is a part of the line segmentation algorithm.
+
+TODO: revise this...
 This Node class is abstraction of nodes in segmentation tree.
 Each node contains its name, metadata, and a "pointer" pointed the geometric it represents.
 Also, since it is a node in graph, it will contain its parents and children.
 This would increase the flexibility of changing the segmentation algorithm in the future.
-
-Author: Patavee Meemeng (meemeng@usc.edu)
-May 2019
 """
 
-import json
+from mykgutils import fclrprint
+from json import load
+from psycopg2 import connect, Error as psycopg2_error
+from postgis_sqls import sql_str_reset_all_tables
+from osgeo.ogr import Open as ogr_open
 
-import osgeo.ogr
-import psycopg2
-from psycopg2.extensions import AsIs
 
 
 # wrapper function used to verify necessary information before doing intersect, union etc operation
@@ -206,7 +206,7 @@ class Node:
     @classmethod
     def from_shapefile(cls, path, metadata, name):
         cursor = metadata.connection.cursor()
-        shapefile = osgeo.ogr.Open(path)
+        shapefile = ogr_open(path)
         SQL = '''
         DROP TABLE IF EXISTS %s; 
         CREATE TABLE %s (gid SERIAL NOT NULL PRIMARY KEY);
@@ -245,45 +245,74 @@ class Node:
         return node
 
 
-class Metadata:
-    def __init__(self, config_path):
+class PostGISChannel:
+    def __init__(self, config_path, verbosity, reset_tables=False):
+        ''' Initialize PostGISChannel, used to communicate with PostGIS Backend (via SQL). '''
 
+        # verbosity for easier debugability
+        self.verbosity = verbosity
+
+        # load config file
         try:
-            config = json.load(open(config_path, "r"))
+            config = load(open(config_path, "r"))
         except Exception as e:
-            print("cannot load config file, ERROR: %s" % str(e))
+            print("Cannot load configuration file, ERROR: %s" % str(e))
             exit(-1)
 
+        # load config parameters
         try:
-            self.dbname = config["dbname"]
-            self.user = config["user"]
-            self.host = config["host"]
-            self.table_name = config["table_name"]
-            self.SRID = config["SRID"]
-            self.password = config["password"]
+            self.dbname             = config["dbname"]
+            self.user               = config["user"]
+            self.host               = config["host"]
+            self.geom_table_name    = config["geom_table_name"]
+            self.map_table_name     = config["map_table_name"]
+            self.contain_table_name = config["contain_table_name"]
+            self.SRID               = config["SRID"]
         except LookupError:
-            print("invalid config JSON")
+            print("Invalid configuration file")
             exit(-1)
 
+        # establish connection
         try:
-            self.connection = psycopg2.connect(dbname=self.dbname,
-                                               user=self.user,
-                                               host=self.host,
-                                               password=self.password)
-        except psycopg2.Error as e:
+            self.connection = connect(dbname=self.dbname,
+                                      user=self.user,
+                                      host=self.host)
+            fclrprint(f'Connection established to {self.dbname} [{self.user}@{self.host}]', 'g')
+        except psycopg2_error as e:
             print("Unable to connect to the database: %s" % str(e))
             exit(-1)
 
+        # reset tables if requested
+        if reset_tables:
+            self.reset_all_tables()
 
+    def pgcprint(self, pstr):
+        ''' Debug printing method. '''
+
+        if self.verbosity:
+            fclrprint(pstr, 'b')
+
+    def reset_all_tables(self):
+        ''' Reset all tables (geom, map, contain). '''
+
+        # construct command
+        sql_reset_all_tables = sql_str_reset_all_tables(self.geom_table_name, \
+                                self.map_table_name, self.contain_table_name, self.SRID)
+        # get cursor
+        cur = self.connection.cursor()
+        # execute command
+        cur.execute(sql_reset_all_tables)
+        # (debug) print
+        self.pgcprint(cur.query.decode())
+        # commit changes
+        self.connection.commit()
+
+'''
 if __name__ == "__main__":
-    # test
+    
 
-    config_path = r"C:\Users\Wii\Google Drive USC\usc\ISI\7maps_clip\clipped\config2.json"
-    meta = Metadata(config_path)
-
-    print("====create new nodes====")
-    node54 = Node.from_shapefile(r"C:\Users\Wii\Google Drive USC\usc\ISI\7maps_clip\clipped\1954c.shp", meta, "1954")
-    node62 = Node.from_shapefile(r"C:\Users\Wii\Google Drive USC\usc\ISI\7maps_clip\clipped\1962c.shp", meta, "1962")
+    node54 = Node.from_shapefile("~/1954c.shp", meta, "1954")
+    node62 = Node.from_shapefile("~/1962c.shp", meta, "1962")
     print("node 1954", node54)
     print("node 1962", node62)
 
@@ -308,3 +337,4 @@ if __name__ == "__main__":
 
     node62.metadata = None
     node54.intersect(node62)
+'''

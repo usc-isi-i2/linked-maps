@@ -2,9 +2,8 @@
     "dbname": "linkedmap",
     "user": "baselshbita",
     "host": "localhost",
-    "map_table_name": "map",
-    "same_as_table_name": "sameas",
-    "contain_table_name": "contain",
     "geom_table_name": "geom",
+    "map_table_name": "map",
+    "contain_table_name": "contain",
     "SRID": 4269
 }
