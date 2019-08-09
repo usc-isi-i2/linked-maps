@@ -52,7 +52,7 @@ class Segment:
     def __repr__(self):
         ''' Print string for segment class. '''
 
-        return f'name: {self.name}, parents: {self.parents.keys()}, children: {self.children.keys()}'
+        return f'name: {self.name}, gid: {self.gid}, parents: {self.parents.keys()}, children: {self.children.keys()}'
 
     @verify
     def perform_sql_op(self, other_seg, new_name, operation, buff=0.0015):
