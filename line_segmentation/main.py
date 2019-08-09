@@ -46,15 +46,30 @@ def process_shapefiles(directory_path, configuration_file, verbosity_on, reset_d
     fclrprint(f'Finshed creating source_nodes: {source_nodes}', 'p')
     nd0 = source_nodes[0]
     nd1 = source_nodes[1]
-    fclrprint(f'Testing intersection between {nd0.name} and {nd1.name}', 'p')
-    child_node = nd0.intersect(nd1, f'i_{nd0.name}_{nd1.name}')
-    fclrprint(f'created child_node {child_node.name}: {child_node}', 'p')
-    fclrprint(f'modified 1st parent_node {nd0.name}: {nd0}', 'p')
-    fclrprint(f'modified 2nd parent_node {nd1.name}: {nd1}', 'p')
 
+    fclrprint(f'Testing intersection between {nd0.name} (nd0) and {nd1.name} (nd1)', 'p')
+    ndint = nd0.intersect(nd1, f'i_{nd0.name}_{nd1.name}')
+    fclrprint(f'created ndint {ndint.name}: {ndint}', 'p')
+    fclrprint(f'modified nd0 {nd0.name}: {nd0}', 'p')
+    fclrprint(f'modified nd1 {nd1.name}: {nd1}', 'p')
     channel_inst.connection.commit()
-    fclrprint('Segmentation finished!', 'g')
+
+    fclrprint(f'Testing minus between {nd0.name} (nd0) and {ndint.name} (ndint)', 'p')
+    nd0_min_ndint = nd0.minus(ndint, f'm_{nd0.name}_{ndint.name}')
+    fclrprint(f'created nd0_min_ndint {nd0_min_ndint.name}: {nd0_min_ndint}', 'p')
+    fclrprint(f'modified nd0 {nd0.name}: {nd0}', 'p')
+    fclrprint(f'modified nd1 {nd1.name}: {nd1}', 'p')
+    channel_inst.connection.commit()
+
+    fclrprint(f'Testing minus between {nd1.name} (nd1) and {ndint.name} (ndint)', 'p')
+    nd1_min_ndint = nd1.minus(ndint, f'm_{nd1.name}_{ndint.name}')
+    fclrprint(f'created nd1_min_ndint {nd1_min_ndint.name}: {nd1_min_ndint}', 'p')
+    fclrprint(f'modified nd0 {nd0.name}: {nd0}', 'p')
+    fclrprint(f'modified nd1 {nd1.name}: {nd1}', 'p')
+    channel_inst.connection.commit()
     '''
+
+    fclrprint('Segmentation finished!', 'g')
 
 if __name__ == '__main__':
     main()

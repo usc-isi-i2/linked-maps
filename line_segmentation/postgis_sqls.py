@@ -18,16 +18,16 @@ def sqlstr_reset_all_tables(geom_tablename, contain_tablename, srid):
         '''
     return sql_str
 
-def sqlstr_intersect_records(geom_tablename, segment_1_gid, segment_2_gid, buffer_size):
-    ''' Get SQL string to intersect two records . '''
-
+def sqlstr_op_records(operation, geom_tablename, segment_1_gid, segment_2_gid, buffer_size):
+    ''' Get SQL string to perform operation 'op' between two records . '''
+    
     sql_str = f'''
         INSERT INTO {AsIs(geom_tablename)} (wkt, geom) 
         SELECT ST_ASTEXT(res.lr), lr
         FROM(
             SELECT ST_MULTI(ST_INTERSECTION(
                 l.geom, 
-                ST_INTERSECTION(
+                {operation}(
                     st_buffer(l.geom, {buffer_size}), 
                     st_buffer(r.geom, {buffer_size}))         
             )) as lr

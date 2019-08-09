@@ -12,9 +12,13 @@ from mykgutils import fclrprint
 from json import load
 from psycopg2 import connect, Error as psycopg2_error
 from psycopg2.extensions import AsIs
-from postgis_sqls import sqlstr_reset_all_tables, sqlstr_intersect_records, \
+from postgis_sqls import sqlstr_reset_all_tables, sqlstr_op_records, \
                         sqlstr_create_gid_geom_table, sqlstr_insert_new_record_to_geom_table
 from osgeo.ogr import Open as ogr_open
+
+OPERATION_INTERSECT = 'ST_INTERSECTION'
+OPERATION_UNION = 'ST_UNION'
+OPERATION_MINUS = 'ST_DIFFERENCE'
 
 def verify(func):
     '''wrapper function used to verify necessary information
@@ -54,134 +58,45 @@ class Node:
         return f'name: {self.name}, parents: {self.parents.keys()}, children: {self.children.keys()}'
 
     @verify
+    def perform_sql_op(self, other_node, new_name, operation, buff=0.0015):
+        ''' Performs an operation on the segment class with an additional segment,
+        supported operations: OPERATION_INTERSECT, OPERATION_UNION, OPERATION_MINUS '''
+
+        sql_op_segments = sqlstr_op_records(operation, self.pgchannel.geom_table_name, self.gid, other_node.gid, buff)
+        cur = self.pgchannel.connection.cursor()
+        cur.execute(sql_op_segments)
+        self.pgchannel.pgcprint(cur.query.decode())
+        new_gid = cur.fetchone()[0]
+        new_node = Node(self.pgchannel, new_gid, new_name)
+
+        return new_node
+
     def intersect(self, other_node, new_name, buff=0.0015):
         ''' Intersect the segment class with an additional segment. '''
 
-        # construct command
-        sql_intersect_segments = sqlstr_intersect_records(self.pgchannel.geom_table_name, self.gid, other_node.gid, buff)
-        # get cursor
-        cur = self.pgchannel.connection.cursor()
-        # execute command
-        cur.execute(sql_intersect_segments)
-        # (debug) print
-        self.pgchannel.pgcprint(cur.query.decode())
-        # get new_gid
-        new_gid = cur.fetchone()
-        # create new_node
-        new_node = Node(self.pgchannel, new_gid, new_name)
+        new_node = self.perform_sql_op(other_node, new_name, OPERATION_INTERSECT, buff)
+
         # set children
         self.children[new_name] = new_node
         other_node.children[new_name] = new_node
         # set parents
         new_node.parents[self.name] = self
         new_node.parents[other_node.name] = other_node
-
         return new_node
 
-    @verify
     def union(self, other_node, new_name, buff=0.0015):
-        cur = self.pgchannel.connection.cursor()
-        SQL = '''
-            INSERT INTO %s (wkt, geom) 
-            SELECT ST_ASTEXT(res.lr), lr
-            FROM(
-                SELECT ST_MULTI(ST_INTERSECTION(
-                    l.geom, 
-                    ST_UNION(
-                        st_buffer(l.geom, %s), 
-                        st_buffer(r.geom, %s))         
-                )) as lr
-                FROM 
-                    (
-                    SELECT geom
-                    FROM %s
-                    WHERE %s.gid = %s
-                    ) as l,
-                    (
-                    SELECT geom
-                    FROM %s
-                    WHERE %s.gid = %s
-                    ) as r
-            ) res
-            where ST_geometrytype(res.lr) = 'ST_MultiLineString'
-            RETURNING gid
+        ''' Union the segment class with an additional segment. '''
 
-        '''
-        cur.execute(SQL,
-                    (AsIs(self.pgchannel.table_name),
-                     AsIs(buff),
-                     AsIs(buff),
-                     AsIs(self.pgchannel.table_name),
-                     AsIs(self.pgchannel.table_name),
-                     AsIs(self.gid),
-                     AsIs(self.pgchannel.table_name),
-                     AsIs(self.pgchannel.table_name),
-                     AsIs(other_node.gid),
-                     ))
-
-        new_gid = cur.fetchone()
-        new_node = Node(self.pgchannel, new_gid, new_name)
-
-        # Note: Union Operation shall not result in any graph relations
-
-        # self.children[new_name] = new_node
-        # other_node.children[new_name] = new_node
-        # new_node.parents[self.name] = self
-        # new_node.parents[other_node.name] = other_node
-
+        new_node = self.perform_sql_op(other_node, new_name, OPERATION_UNION, buff)
         return new_node
 
-    @verify
     def minus(self, other_node, new_name, buff=0.0015):
-        cur = self.pgchannel.connection.cursor()
-        SQL = '''
-            INSERT INTO %s (wkt, geom) 
-            SELECT ST_ASTEXT(res.lr), lr
-            FROM(
-                SELECT ST_MULTI(ST_INTERSECTION(
-                    l.geom, 
-                    ST_DIFFERENCE(
-                        st_buffer(l.geom, %s), 
-                        st_buffer(r.geom, %s))         
-                )) as lr
-                FROM 
-                    (
-                    SELECT geom
-                    FROM %s
-                    WHERE %s.gid = %s
-                    ) as l,
-                    (
-                    SELECT geom
-                    FROM %s
-                    WHERE %s.gid = %s
-                    ) as r
-            ) res
-            where ST_geometrytype(res.lr) = 'ST_MultiLineString'
-            RETURNING gid
+        ''' Minus the segment class with an additional segment. '''
 
-        '''
-        cur.execute(SQL,
-                    (AsIs(self.pgchannel.table_name),
-                     AsIs(buff),
-                     AsIs(buff),
-                     AsIs(self.pgchannel.table_name),
-                     AsIs(self.pgchannel.table_name),
-                     AsIs(self.gid),
-                     AsIs(self.pgchannel.table_name),
-                     AsIs(self.pgchannel.table_name),
-                     AsIs(other_node.gid),
-                     ))
-
-        new_gid = cur.fetchone()
-        new_node = Node(self.pgchannel, new_gid, new_name)
+        new_node = self.perform_sql_op(other_node, new_name, OPERATION_MINUS, buff)
 
         self.children[new_name] = new_node
         new_node.parents[self.name] = self
-
-        # Note: New node should not be children of other_node (because of minus operation)
-        # other_node.children[new_name] = new_node
-        # new_node.parents[other_node.name] = other_node
-
         return new_node
 
     @classmethod
@@ -285,24 +200,3 @@ class PostGISChannel:
         # commit changes
         self.connection.commit()
         fclrprint(f'Reset tables finished', 'c')
-
-
-'''
-if __name__ == "__main__":
-
-    print("====test union====")
-    new_union = node54.union(node62, "1954,1962-u")
-    print("new node union", new_union)
-
-    print("====test minus====")
-    new_minus = node54.minus(node62, "1954,1962-m")
-    print("new node minus", new_minus)
-    print("node 1954", node54)
-    print("node 1962", node62)
-
-    print("====test error checking====")
-    node54.intersect(node54)
-
-    node62.metadata = None
-    node54.intersect(node62)
-'''
