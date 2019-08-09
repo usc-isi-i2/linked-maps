@@ -54,47 +54,67 @@ class Segment:
 
         return f'name: {self.name}, gid: {self.gid}, parents: {self.parents.keys()}, children: {self.children.keys()}'
 
-    @verify
-    def perform_sql_op(self, other_seg, new_name, operation, buff=0.0015):
+    def perform_sql_op(self, list_of_other_gids, new_name, operation, buff=0.0015):
         ''' Performs an operation on the segment class with an additional segment,
         supported operations: OPERATION_INTERSECT, OPERATION_UNION, OPERATION_MINUS '''
 
-        sql_op_segments = sqlstr_op_records(operation, self.pgchannel.geom_table_name, self.gid, other_seg.gid, buff)
+        sql_op_segments = sqlstr_op_records(operation, self.pgchannel.geom_table_name, self.gid, list_of_other_gids, buff)
         cur = self.pgchannel.connection.cursor()
         cur.execute(sql_op_segments)
         self.pgchannel.pgcprint(cur.query.decode())
-        new_gid = cur.fetchone()[0]
-        new_seg = Segment(self.pgchannel, new_gid, new_name)
+        fetched_entry = cur.fetchone()
+        try:
+            new_gid = fetched_entry[0]
+            new_seg = Segment(self.pgchannel, new_gid, new_name)
+            return new_seg
+        except:
+            pass
 
-        return new_seg
+        return None
 
+    @verify
     def intersect(self, other_seg, new_name, buff=0.0015):
         ''' Intersect the segment class with an additional segment. '''
 
-        new_seg = self.perform_sql_op(other_seg, new_name, OPERATION_INTERSECT, buff)
+        new_seg = self.perform_sql_op([other_seg.gid], new_name, OPERATION_INTERSECT, buff)
 
-        # set children
-        self.children[new_name] = new_seg
-        other_seg.children[new_name] = new_seg
-        # set parents
-        new_seg.parents[self.name] = self
-        new_seg.parents[other_seg.name] = other_seg
+        if new_seg:
+            # set children
+            self.children[new_name] = new_seg
+            other_seg.children[new_name] = new_seg
+            # set parents
+            new_seg.parents[self.name] = self
+            new_seg.parents[other_seg.name] = other_seg
         return new_seg
 
+    @verify
     def union(self, other_seg, new_name, buff=0.0015):
         ''' Union the segment class with an additional segment. '''
 
-        new_seg = self.perform_sql_op(other_seg, new_name, OPERATION_UNION, buff)
+        new_seg = self.perform_sql_op([other_seg.gid], new_name, OPERATION_UNION, buff)
         return new_seg
 
+    @verify
     def minus(self, other_seg, new_name, buff=0.0015):
         ''' Minus the segment class with an additional segment. '''
 
-        new_seg = self.perform_sql_op(other_seg, new_name, OPERATION_MINUS, buff)
+        new_seg = self.perform_sql_op([other_seg.gid], new_name, OPERATION_MINUS, buff)
 
-        self.children[new_name] = new_seg
-        new_seg.parents[self.name] = self
+        if new_seg:
+            self.children[new_name] = new_seg
+            new_seg.parents[self.name] = self
         return new_seg
+
+    def minus_union_of_segments(self, list_of_other_segs, new_name, buff=0.0015):
+        ''' Minus the segment class with a list of additional segments. '''
+
+        new_seg = self.perform_sql_op(list_of_other_segs, new_name, OPERATION_MINUS, buff)
+
+        if new_seg:
+            self.children[new_name] = new_seg
+            new_seg.parents[self.name] = self
+        return new_seg
+
 
     @classmethod
     def from_shapefile(cls, path, pg_channel_obj, name):

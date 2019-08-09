@@ -13,9 +13,11 @@ def sqlstr_reset_all_tables(geom_tablename, srid):
         '''
     return sql_str
 
-def sqlstr_op_records(operation, geom_tablename, segment_1_gid, segment_2_gid, buffer_size):
+def sqlstr_op_records(operation, geom_tablename, segment_1_gid, list_of_gids, buffer_size):
     ''' Get SQL string to perform operation 'op' between two records . '''
     
+    sql_substring = sql_str_build_or_clause_of_gids(geom_tablename, list_of_gids)
+
     sql_str = f'''
         INSERT INTO {AsIs(geom_tablename)} (wkt, geom) 
         SELECT ST_ASTEXT(res.lr), lr
@@ -35,7 +37,7 @@ def sqlstr_op_records(operation, geom_tablename, segment_1_gid, segment_2_gid, b
                 (
                 SELECT geom
                 FROM {AsIs(geom_tablename)}
-                WHERE {AsIs(geom_tablename)}.gid = {segment_2_gid}
+                WHERE {sql_substring}
                 ) as r
         ) res
         where ST_geometrytype(res.lr) = 'ST_MultiLineString'
@@ -63,3 +65,13 @@ def sqlstr_insert_new_record_to_geom_table(geom_tablename, active_tablename):
             RETURNING gid;
         '''
     return sql_str
+
+def sql_str_build_or_clause_of_gids(geom_tablename, list_of_gids):
+    ''' Union (clause) of gids from a list of gid/gids. '''
+
+    sql_substr = f""
+    for gid_idx, gid_val in enumerate(list_of_gids):
+        if gid_idx > 0:
+            sql_substr += f' or'
+        sql_substr +=  f' {AsIs(geom_tablename)}.gid = {gid_val}'
+    return sql_substr
