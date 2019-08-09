@@ -2,8 +2,7 @@
     "dbname": "linkedmap",
     "user": "baselshbita",
     "host": "localhost",
-    "geom_table_name": "geom",
-    "map_table_name": "map",
+    "geom_table_name": "geomerty",
     "contain_table_name": "contain",
     "SRID": 4269
 }

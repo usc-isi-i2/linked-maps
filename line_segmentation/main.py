@@ -2,12 +2,7 @@ from argparse import ArgumentParser
 from os import listdir
 from os.path import basename
 from mykgutils import fclrprint
-from Node import PostGISChannel
-
-'''
-TODO: remove
-from new_segment import Segment
-'''
+from Node import PostGISChannel, Node
 
 # --- entrypoint --------------------------------------------------------------
 
@@ -31,21 +26,35 @@ def process_shapefiles(directory_path, configuration_file, verbosity_on, reset_d
     ''' Generate csv tables from shapefile in a given directory,
     use given configurations to interact with POSTGRESQL to execute POSTGIS actions. '''
 
-    config_md_inst = PostGISChannel(configuration_file, verbosity_on, reset_database)
-    # TODO: sub: segment = Segment(path_to_config, is_reset = True)
+    channel_inst = PostGISChannel(configuration_file, verbosity_on, reset_database)
+    source_nodes = list()
     for fname in listdir(directory_path):
         if fname.endswith(".shp"):
             fname_no_ext = fname.split('.shp')[0]
             full_fname = directory_path + '/' + fname
             fclrprint(f'Processing {full_fname}', 'c')
             try:
-                fclrprint(f'segment.do_segment()', 'c')
-                # TODO: sub: segment.do_segment(full_fname, fname_no_ext, True)
+                node = Node.from_shapefile(full_fname, channel_inst, fname_no_ext)
+                fclrprint(f'created node from shapefile {full_fname}: {node}', 'c')
+                source_nodes.append(node)
             except Exception as e:
                 fclrprint(f'Failed processing file {full_fname}\n{str(e)}', 'r')
                 exit(-1)
             # TODO: sub: segment.sql_commit()
+    '''
+    # testing....
+    fclrprint(f'Finshed creating source_nodes: {source_nodes}', 'p')
+    nd0 = source_nodes[0]
+    nd1 = source_nodes[1]
+    fclrprint(f'Testing intersection between {nd0.name} and {nd1.name}', 'p')
+    child_node = nd0.intersect(nd1, f'i_{nd0.name}_{nd1.name}')
+    fclrprint(f'created child_node {child_node.name}: {child_node}', 'p')
+    fclrprint(f'modified 1st parent_node {nd0.name}: {nd0}', 'p')
+    fclrprint(f'modified 2nd parent_node {nd1.name}: {nd1}', 'p')
+
+    channel_inst.connection.commit()
     fclrprint('Segmentation finished!', 'g')
+    '''
 
 if __name__ == '__main__':
     main()

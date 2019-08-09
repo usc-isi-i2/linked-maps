@@ -11,16 +11,17 @@ This would increase the flexibility of changing the segmentation algorithm in th
 from mykgutils import fclrprint
 from json import load
 from psycopg2 import connect, Error as psycopg2_error
-from postgis_sqls import sql_str_reset_all_tables
+from psycopg2.extensions import AsIs
+from postgis_sqls import sqlstr_reset_all_tables, sqlstr_intersect_records, \
+                        sqlstr_create_gid_geom_table, sqlstr_insert_new_record_to_geom_table
 from osgeo.ogr import Open as ogr_open
 
-
-
-# wrapper function used to verify necessary information before doing intersect, union etc operation
 def verify(func):
+    '''wrapper function used to verify necessary information
+    before doing intersect, union etc operation. '''
     def inner(*args, **kwargs):
-        if args[0].metadata != args[1].metadata:
-            print("ERROR: Metadata Mismatched")
+        if args[0].pgchannel != args[1].pgchannel:
+            print("ERROR: PostGISChannel mismatch")
             return None
 
         if args[0] == args[1]:
@@ -36,70 +37,50 @@ def verify(func):
 
 
 class Node:
-    def __init__(self, metadata, gid, name):
-        self.metadata = metadata
+    ''' Class representing a single segment (record in 'map' table on POSTGIS BE) '''
+
+    def __init__(self, pg_channel_obj, gid, name):
+        ''' Initialize Segment. '''
+
+        self.pgchannel = pg_channel_obj
         self.gid = gid
         self.name = name
-        self.parent = dict()  # parentname : node object
-        self.child = dict()  # childname : node object
+        self.parents = dict()  # { parentname: node object }
+        self.children = dict()  # { childname: node object }
 
     def __repr__(self):
-        return "name : {}, parent: {}, child: {}".format(self.name, self.parent.keys(), self.child.keys())
+        ''' Print string for segment class. '''
+
+        return f'name: {self.name}, parents: {self.parents.keys()}, children: {self.children.keys()}'
 
     @verify
     def intersect(self, other_node, new_name, buff=0.0015):
-        cur = self.metadata.connection.cursor()
-        SQL = '''
-            INSERT INTO %s (wkt, geom) 
-            SELECT ST_ASTEXT(res.lr), lr
-            FROM(
-                SELECT ST_MULTI(ST_INTERSECTION(
-                    l.geom, 
-                    ST_INTERSECTION(
-                        st_buffer(l.geom, %s), 
-                        st_buffer(r.geom, %s))         
-                )) as lr
-                FROM 
-                    (
-                    SELECT geom
-                    FROM %s
-                    WHERE %s.gid = %s
-                    ) as l,
-                    (
-                    SELECT geom
-                    FROM %s
-                    WHERE %s.gid = %s
-                    ) as r
-            ) res
-            where ST_geometrytype(res.lr) = 'ST_MultiLineString'
-            RETURNING gid
+        ''' Intersect the segment class with an additional segment. '''
 
-        '''
-        cur.execute(SQL,
-                    (AsIs(self.metadata.table_name),
-                     AsIs(buff),
-                     AsIs(buff),
-                     AsIs(self.metadata.table_name),
-                     AsIs(self.metadata.table_name),
-                     AsIs(self.gid),
-                     AsIs(self.metadata.table_name),
-                     AsIs(self.metadata.table_name),
-                     AsIs(other_node.gid),
-                     ))
-
+        # construct command
+        sql_intersect_segments = sqlstr_intersect_records(self.pgchannel.geom_table_name, self.gid, other_node.gid, buff)
+        # get cursor
+        cur = self.pgchannel.connection.cursor()
+        # execute command
+        cur.execute(sql_intersect_segments)
+        # (debug) print
+        self.pgchannel.pgcprint(cur.query.decode())
+        # get new_gid
         new_gid = cur.fetchone()
-        new_node = Node(self.metadata, new_gid, new_name)
-
-        self.child[new_name] = new_node
-        other_node.child[new_name] = new_node
-        new_node.parent[self.name] = self
-        new_node.parent[other_node.name] = other_node
+        # create new_node
+        new_node = Node(self.pgchannel, new_gid, new_name)
+        # set children
+        self.children[new_name] = new_node
+        other_node.children[new_name] = new_node
+        # set parents
+        new_node.parents[self.name] = self
+        new_node.parents[other_node.name] = other_node
 
         return new_node
 
     @verify
     def union(self, other_node, new_name, buff=0.0015):
-        cur = self.metadata.connection.cursor()
+        cur = self.pgchannel.connection.cursor()
         SQL = '''
             INSERT INTO %s (wkt, geom) 
             SELECT ST_ASTEXT(res.lr), lr
@@ -127,32 +108,32 @@ class Node:
 
         '''
         cur.execute(SQL,
-                    (AsIs(self.metadata.table_name),
+                    (AsIs(self.pgchannel.table_name),
                      AsIs(buff),
                      AsIs(buff),
-                     AsIs(self.metadata.table_name),
-                     AsIs(self.metadata.table_name),
+                     AsIs(self.pgchannel.table_name),
+                     AsIs(self.pgchannel.table_name),
                      AsIs(self.gid),
-                     AsIs(self.metadata.table_name),
-                     AsIs(self.metadata.table_name),
+                     AsIs(self.pgchannel.table_name),
+                     AsIs(self.pgchannel.table_name),
                      AsIs(other_node.gid),
                      ))
 
         new_gid = cur.fetchone()
-        new_node = Node(self.metadata, new_gid, new_name)
+        new_node = Node(self.pgchannel, new_gid, new_name)
 
         # Note: Union Operation shall not result in any graph relations
 
-        # self.child[new_name] = new_node
-        # other_node.child[new_name] = new_node
-        # new_node.parent[self.name] = self
-        # new_node.parent[other_node.name] = other_node
+        # self.children[new_name] = new_node
+        # other_node.children[new_name] = new_node
+        # new_node.parents[self.name] = self
+        # new_node.parents[other_node.name] = other_node
 
         return new_node
 
     @verify
     def minus(self, other_node, new_name, buff=0.0015):
-        cur = self.metadata.connection.cursor()
+        cur = self.pgchannel.connection.cursor()
         SQL = '''
             INSERT INTO %s (wkt, geom) 
             SELECT ST_ASTEXT(res.lr), lr
@@ -180,44 +161,45 @@ class Node:
 
         '''
         cur.execute(SQL,
-                    (AsIs(self.metadata.table_name),
+                    (AsIs(self.pgchannel.table_name),
                      AsIs(buff),
                      AsIs(buff),
-                     AsIs(self.metadata.table_name),
-                     AsIs(self.metadata.table_name),
+                     AsIs(self.pgchannel.table_name),
+                     AsIs(self.pgchannel.table_name),
                      AsIs(self.gid),
-                     AsIs(self.metadata.table_name),
-                     AsIs(self.metadata.table_name),
+                     AsIs(self.pgchannel.table_name),
+                     AsIs(self.pgchannel.table_name),
                      AsIs(other_node.gid),
                      ))
 
         new_gid = cur.fetchone()
-        new_node = Node(self.metadata, new_gid, new_name)
+        new_node = Node(self.pgchannel, new_gid, new_name)
 
-        self.child[new_name] = new_node
-        new_node.parent[self.name] = self
+        self.children[new_name] = new_node
+        new_node.parents[self.name] = self
 
-        # Note: New node should not be child of other_node (because of minus operation)
-        # other_node.child[new_name] = new_node
-        # new_node.parent[other_node.name] = other_node
+        # Note: New node should not be children of other_node (because of minus operation)
+        # other_node.children[new_name] = new_node
+        # new_node.parents[other_node.name] = other_node
 
         return new_node
 
     @classmethod
-    def from_shapefile(cls, path, metadata, name):
-        cursor = metadata.connection.cursor()
-        shapefile = ogr_open(path)
-        SQL = '''
-        DROP TABLE IF EXISTS %s; 
-        CREATE TABLE %s (gid SERIAL NOT NULL PRIMARY KEY);
-        SELECT AddGeometryColumn(%s, 'geom', %s, 'MULTILINESTRING', 2);
-        '''
+    def from_shapefile(cls, path, pg_channel_obj, name):
+        ''' Create a segment class from shapefile. '''
 
-        table_name = "temp"
-        cursor.execute(SQL, (AsIs(table_name), AsIs(table_name), table_name, metadata.SRID,))
+        cur = pg_channel_obj.connection.cursor()
+
+        working_segment_table_name = 'active_seg'
+        sql_create_table = sqlstr_create_gid_geom_table(working_segment_table_name, pg_channel_obj.SRID)
+        
+        cur.execute(sql_create_table)
+        pg_channel_obj.pgcprint(cur.query.decode())
+
+        shapefile = ogr_open(path)
         layer = shapefile.GetLayer(0)
 
-        SQL_2 = '''
+        sql_insert_geom_values_to_table = '''
         INSERT INTO %s (geom) VALUES (ST_MULTI(ST_GeometryFromText(%s, %s)))
         '''
 
@@ -225,29 +207,31 @@ class Node:
         for i in range(total_feature_count_in_map):
             feature = layer.GetFeature(i)
             wkt = feature.GetGeometryRef().ExportToWkt()
-            cursor.execute(SQL_2, (AsIs(table_name), wkt, metadata.SRID))
+            cur.execute(sql_insert_geom_values_to_table, (AsIs(working_segment_table_name), wkt, pg_channel_obj.SRID))
+        pg_channel_obj.pgcprint(f'.... Added {total_feature_count_in_map} geometry lines (records) to {working_segment_table_name}')
 
-        INSERT_NEW_MAP = '''
-            INSERT INTO %s (wkt, geom)
-            SELECT ST_ASTEXT(ST_UNION(geom)), ST_UNION(geom)
-            FROM %s
-            RETURNING gid;
-        '''
-        cursor.execute(INSERT_NEW_MAP, (
-            AsIs(metadata.table_name),
-            AsIs(table_name)))
+        sql_insert_new_segment = sqlstr_insert_new_record_to_geom_table(pg_channel_obj.geom_table_name, working_segment_table_name)
+        cur.execute(sql_insert_new_segment)
+        pg_channel_obj.pgcprint(cur.query.decode())
 
-        gid = cursor.fetchone()[0]
-        cursor.execute("DROP TABLE %s", (AsIs(table_name),))
+        gid = cur.fetchone()[0]
+        cur.execute(f'DROP TABLE {AsIs(working_segment_table_name)}')
+        pg_channel_obj.pgcprint(cur.query.decode())
 
-        metadata.connection.commit()
-        node = cls(metadata, gid, name)
+        # commit changes
+        pg_channel_obj.connection.commit()
+        fclrprint(f'Created {name} from {path}', 'c')
+
+        node = cls(pg_channel_obj, gid, name)
         return node
 
 
 class PostGISChannel:
+    ''' Class defining a PostGIS connection channel, 
+    holds attributes and communication objcet for SQL (POSTGIS) transmission. '''
+
     def __init__(self, config_path, verbosity, reset_tables=False):
-        ''' Initialize PostGISChannel, used to communicate with PostGIS Backend (via SQL). '''
+        ''' Initialize PostGISChannel. '''
 
         # verbosity for easier debugability
         self.verbosity = verbosity
@@ -265,7 +249,6 @@ class PostGISChannel:
             self.user               = config["user"]
             self.host               = config["host"]
             self.geom_table_name    = config["geom_table_name"]
-            self.map_table_name     = config["map_table_name"]
             self.contain_table_name = config["contain_table_name"]
             self.SRID               = config["SRID"]
         except LookupError:
@@ -295,32 +278,17 @@ class PostGISChannel:
     def reset_all_tables(self):
         ''' Reset all tables (geom, map, contain). '''
 
-        # construct command
-        sql_reset_all_tables = sql_str_reset_all_tables(self.geom_table_name, \
-                                self.map_table_name, self.contain_table_name, self.SRID)
-        # get cursor
+        sql_reset_all_tables = sqlstr_reset_all_tables(self.geom_table_name, self.contain_table_name, self.SRID)
         cur = self.connection.cursor()
-        # execute command
         cur.execute(sql_reset_all_tables)
-        # (debug) print
         self.pgcprint(cur.query.decode())
         # commit changes
         self.connection.commit()
+        fclrprint(f'Reset tables finished', 'c')
+
 
 '''
 if __name__ == "__main__":
-    
-
-    node54 = Node.from_shapefile("~/1954c.shp", meta, "1954")
-    node62 = Node.from_shapefile("~/1962c.shp", meta, "1962")
-    print("node 1954", node54)
-    print("node 1962", node62)
-
-    print("====test intersection====")
-    new_intersect = node54.intersect(node62, "1954,1962-i")
-    print("new node intersection", new_intersect)
-    print("node 1954", node54)
-    print("node 1962", node62)
 
     print("====test union====")
     new_union = node54.union(node62, "1954,1962-u")
