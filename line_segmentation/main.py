@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from os import listdir
 from os.path import basename
 from mykgutils import fclrprint
-from Node import PostGISChannel, Node
+from segment import PostGISChannel, Segment
 
 # --- entrypoint --------------------------------------------------------------
 
@@ -27,25 +27,25 @@ def process_shapefiles(directory_path, configuration_file, verbosity_on, reset_d
     use given configurations to interact with POSTGRESQL to execute POSTGIS actions. '''
 
     channel_inst = PostGISChannel(configuration_file, verbosity_on, reset_database)
-    source_nodes = list()
+    source_segments = list()
     for fname in listdir(directory_path):
         if fname.endswith(".shp"):
             fname_no_ext = fname.split('.shp')[0]
             full_fname = directory_path + '/' + fname
             fclrprint(f'Processing {full_fname}', 'c')
             try:
-                node = Node.from_shapefile(full_fname, channel_inst, fname_no_ext)
-                fclrprint(f'created node from shapefile {full_fname}: {node}', 'c')
-                source_nodes.append(node)
+                seg = Segment.from_shapefile(full_fname, channel_inst, fname_no_ext)
+                fclrprint(f'created seg from shapefile {full_fname}: {seg}', 'c')
+                source_segments.append(seg)
             except Exception as e:
                 fclrprint(f'Failed processing file {full_fname}\n{str(e)}', 'r')
                 exit(-1)
             # TODO: sub: segment.sql_commit()
     '''
     # testing....
-    fclrprint(f'Finshed creating source_nodes: {source_nodes}', 'p')
-    nd0 = source_nodes[0]
-    nd1 = source_nodes[1]
+    fclrprint(f'Finshed creating source_segments: {source_segments}', 'p')
+    nd0 = source_segments[0]
+    nd1 = source_segments[1]
 
     fclrprint(f'Testing intersection between {nd0.name} (nd0) and {nd1.name} (nd1)', 'p')
     ndint = nd0.intersect(nd1, f'i_{nd0.name}_{nd1.name}')

@@ -1,11 +1,8 @@
 """
 This class is a part of the line segmentation algorithm.
-
-TODO: revise this...
-This Node class is abstraction of nodes in segmentation tree.
-Each node contains its name, metadata, and a "pointer" pointed the geometric it represents.
+This Segment class is abstraction of segments (nodes) in segmentation tree.
+Each segment contains its name, PostGISChannel object, and a "pointer" pointed the geometric it represents.
 Also, since it is a node in graph, it will contain its parents and children.
-This would increase the flexibility of changing the segmentation algorithm in the future.
 """
 
 from mykgutils import fclrprint
@@ -29,7 +26,7 @@ def verify(func):
             return None
 
         if args[0] == args[1]:
-            print("ERROR: Same Node")
+            print("ERROR: Same Segment")
             return None
 
         if args[0].name == args[1].name:
@@ -40,7 +37,7 @@ def verify(func):
     return inner
 
 
-class Node:
+class Segment:
     ''' Class representing a single segment (record in 'map' table on POSTGIS BE) '''
 
     def __init__(self, pg_channel_obj, gid, name):
@@ -49,8 +46,8 @@ class Node:
         self.pgchannel = pg_channel_obj
         self.gid = gid
         self.name = name
-        self.parents = dict()  # { parentname: node object }
-        self.children = dict()  # { childname: node object }
+        self.parents = dict()  # { parentname: Segment object }
+        self.children = dict()  # { childname: Segment object }
 
     def __repr__(self):
         ''' Print string for segment class. '''
@@ -58,46 +55,46 @@ class Node:
         return f'name: {self.name}, parents: {self.parents.keys()}, children: {self.children.keys()}'
 
     @verify
-    def perform_sql_op(self, other_node, new_name, operation, buff=0.0015):
+    def perform_sql_op(self, other_seg, new_name, operation, buff=0.0015):
         ''' Performs an operation on the segment class with an additional segment,
         supported operations: OPERATION_INTERSECT, OPERATION_UNION, OPERATION_MINUS '''
 
-        sql_op_segments = sqlstr_op_records(operation, self.pgchannel.geom_table_name, self.gid, other_node.gid, buff)
+        sql_op_segments = sqlstr_op_records(operation, self.pgchannel.geom_table_name, self.gid, other_seg.gid, buff)
         cur = self.pgchannel.connection.cursor()
         cur.execute(sql_op_segments)
         self.pgchannel.pgcprint(cur.query.decode())
         new_gid = cur.fetchone()[0]
-        new_node = Node(self.pgchannel, new_gid, new_name)
+        new_seg = Segment(self.pgchannel, new_gid, new_name)
 
-        return new_node
+        return new_seg
 
-    def intersect(self, other_node, new_name, buff=0.0015):
+    def intersect(self, other_seg, new_name, buff=0.0015):
         ''' Intersect the segment class with an additional segment. '''
 
-        new_node = self.perform_sql_op(other_node, new_name, OPERATION_INTERSECT, buff)
+        new_seg = self.perform_sql_op(other_seg, new_name, OPERATION_INTERSECT, buff)
 
         # set children
-        self.children[new_name] = new_node
-        other_node.children[new_name] = new_node
+        self.children[new_name] = new_seg
+        other_seg.children[new_name] = new_seg
         # set parents
-        new_node.parents[self.name] = self
-        new_node.parents[other_node.name] = other_node
-        return new_node
+        new_seg.parents[self.name] = self
+        new_seg.parents[other_seg.name] = other_seg
+        return new_seg
 
-    def union(self, other_node, new_name, buff=0.0015):
+    def union(self, other_seg, new_name, buff=0.0015):
         ''' Union the segment class with an additional segment. '''
 
-        new_node = self.perform_sql_op(other_node, new_name, OPERATION_UNION, buff)
-        return new_node
+        new_seg = self.perform_sql_op(other_seg, new_name, OPERATION_UNION, buff)
+        return new_seg
 
-    def minus(self, other_node, new_name, buff=0.0015):
+    def minus(self, other_seg, new_name, buff=0.0015):
         ''' Minus the segment class with an additional segment. '''
 
-        new_node = self.perform_sql_op(other_node, new_name, OPERATION_MINUS, buff)
+        new_seg = self.perform_sql_op(other_seg, new_name, OPERATION_MINUS, buff)
 
-        self.children[new_name] = new_node
-        new_node.parents[self.name] = self
-        return new_node
+        self.children[new_name] = new_seg
+        new_seg.parents[self.name] = self
+        return new_seg
 
     @classmethod
     def from_shapefile(cls, path, pg_channel_obj, name):
@@ -124,6 +121,7 @@ class Node:
             wkt = feature.GetGeometryRef().ExportToWkt()
             cur.execute(sql_insert_geom_values_to_table, (AsIs(working_segment_table_name), wkt, pg_channel_obj.SRID))
         pg_channel_obj.pgcprint(f'.... Added {total_feature_count_in_map} geometry lines (records) to {working_segment_table_name}')
+        
 
         sql_insert_new_segment = sqlstr_insert_new_record_to_geom_table(pg_channel_obj.geom_table_name, working_segment_table_name)
         cur.execute(sql_insert_new_segment)
@@ -137,8 +135,8 @@ class Node:
         pg_channel_obj.connection.commit()
         fclrprint(f'Created {name} from {path}', 'c')
 
-        node = cls(pg_channel_obj, gid, name)
-        return node
+        seg = cls(pg_channel_obj, gid, name)
+        return seg
 
 
 class PostGISChannel:
