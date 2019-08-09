@@ -46,8 +46,8 @@ class Segment:
         self.pgchannel = pg_channel_obj
         self.gid = gid
         self.name = name
-        self.parents = dict()  # { parentname: Segment object }
-        self.children = dict()  # { childname: Segment object }
+        self.parents = dict()  # { parentgid: Segment object }
+        self.children = dict()  # { childgid: Segment object }
 
     def __repr__(self):
         ''' Print string for segment class. '''
@@ -80,11 +80,11 @@ class Segment:
 
         if new_seg:
             # set children
-            self.children[new_name] = new_seg
-            other_seg.children[new_name] = new_seg
+            self.children[new_seg.gid] = new_seg
+            other_seg.children[new_seg.gid] = new_seg
             # set parents
-            new_seg.parents[self.name] = self
-            new_seg.parents[other_seg.name] = other_seg
+            new_seg.parents[self.gid] = self
+            new_seg.parents[other_seg.gid] = other_seg
         return new_seg
 
     @verify
@@ -101,8 +101,8 @@ class Segment:
         new_seg = self.perform_sql_op([other_seg.gid], new_name, OPERATION_MINUS, buff)
 
         if new_seg:
-            self.children[new_name] = new_seg
-            new_seg.parents[self.name] = self
+            self.children[new_seg.gid] = new_seg
+            new_seg.parents[self.gid] = self
         return new_seg
 
     def minus_union_of_segments(self, list_of_other_segs, new_name, buff=0.0015):
@@ -111,8 +111,8 @@ class Segment:
         new_seg = self.perform_sql_op(list_of_other_segs, new_name, OPERATION_MINUS, buff)
 
         if new_seg:
-            self.children[new_name] = new_seg
-            new_seg.parents[self.name] = self
+            self.children[new_seg.gid] = new_seg
+            new_seg.parents[self.gid] = self
         return new_seg
 
 
