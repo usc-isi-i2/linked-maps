@@ -1,3 +1,4 @@
+from os.path import abspath
 from psycopg2.extensions import AsIs
 
 def sqlstr_reset_all_tables(geom_tablename, srid):
@@ -16,7 +17,7 @@ def sqlstr_reset_all_tables(geom_tablename, srid):
 def sqlstr_op_records(operation, geom_tablename, segment_1_gid, list_of_gids, buffer_size):
     ''' Get SQL string to perform operation 'op' between two records . '''
     
-    sql_substring = sql_str_build_or_clause_of_gids(geom_tablename, list_of_gids)
+    sql_substring = sqlstr_build_or_clause_of_gids(geom_tablename, list_of_gids)
 
     sql_str = f'''
         INSERT INTO {AsIs(geom_tablename)} (wkt, geom) 
@@ -66,7 +67,7 @@ def sqlstr_insert_new_record_to_geom_table(geom_tablename, active_tablename):
         '''
     return sql_str
 
-def sql_str_build_or_clause_of_gids(geom_tablename, list_of_gids):
+def sqlstr_build_or_clause_of_gids(geom_tablename, list_of_gids):
     ''' Union (clause) of gids from a list of gid/gids. '''
 
     sql_substr = f""
@@ -75,3 +76,11 @@ def sql_str_build_or_clause_of_gids(geom_tablename, list_of_gids):
             sql_substr += f' or'
         sql_substr +=  f' {AsIs(geom_tablename)}.gid = {gid_val}'
     return sql_substr
+
+def sqlstr_export_geom_table_to_file(geom_tablename, jl_filename):
+    ''' Get SQL commaind for exporting the geometry file to some json-lines file. '''
+
+    sql_str = f'''
+        COPY (SELECT ROW_TO_JSON(t) FROM (SELECT * FROM {AsIs(geom_tablename)}) t) TO '{abspath(jl_filename)}'
+        '''
+    return sql_str

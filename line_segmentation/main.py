@@ -5,25 +5,27 @@ from mykgutils import fclrprint
 from time import time
 from datetime import timedelta
 from segment import PostGISChannel, Segment
+from json import dumps
+from collections import OrderedDict 
 
 # --- entrypoint --------------------------------------------------------------
 
 def main():
 
-    ap = ArgumentParser(description=f'Process shapefiles (vector data) and generate (csv) tables with line segmentation info.\n\tUSAGE: python {basename(__file__)} -d DIR_NAME')
+    ap = ArgumentParser(description=f'Process shapefiles (vector data) and generate (jl) files with line segmentation info.\n\tUSAGE: python {basename(__file__)} -d DIR_NAME -c CONFIG_FILE')
     ap.add_argument('-d', '--dir_name', help='Directory path with shapefiles.', type=str)
     ap.add_argument('-c', '--config_file', help='Input configuration file.', type=str)
+    ap.add_argument('-o', '--output_file', help='Output geometry file (jl).', default='line_seg.jl', type=str)
     ap.add_argument('-v', '--debug_prints', help='Print additional debug prints.', default=False, action='store_true')
     ap.add_argument('-r', '--reset_db', help='Reset Databases prior to processing.', default=False, action='store_true')
     args = ap.parse_args()
 
     if args.dir_name and args.config_file:
         fclrprint(f'Going to process shapefiles in dir {args.dir_name} using configurations from file {args.config_file}...')
-        process_shapefiles(args.dir_name, args.config_file, args.debug_prints, args.reset_db)
+        process_shapefiles(args.dir_name, args.config_file, args.output_file, args.debug_prints, args.reset_db)
     else:
         fclrprint(f'Input directory and configuration file were not provided.', 'r')
         exit(1)
-
 
 class SegmentsGraph:
     ''' Class representing the segments graph. '''
@@ -41,6 +43,23 @@ class SegmentsGraph:
         for seg in self.sg:
             repr_str += str(seg) + '\n'
         return repr_str
+
+    def export_segments_jl_file(self, seg_outputfile):
+        ''' Export segments list to json-lines file '''
+
+        with open(seg_outputfile, 'w') as write_file:
+            for seg in self.sg:
+                line_dict = OrderedDict()
+                line_dict['gid'] = seg.gid
+                line_dict['name'] = seg.name
+                seg_yrs = list()
+                # TODO: mapping from name to year should be read from an external file
+                if '_' not in seg.name:
+                    seg_yrs.append(seg.name[0:4])
+                line_dict['years'] = seg_yrs
+                # serialize constructed dictionary to an output JSON-line
+                write_file.write(dumps(line_dict) + '\n')
+        fclrprint(f'Exported segments info to file {seg_outputfile}', 'c')
 
     def add_segment_to_graph(self, segment):
         ''' Add segment to the graph. '''
@@ -84,7 +103,7 @@ class SegmentsGraph:
                 fclrprint(f'leaf [{seg}]', 'p')
         return list_of_leaf_nodes
 
-def process_shapefiles(directory_path, configuration_file, verbosity_on, reset_database):
+def process_shapefiles(directory_path, configuration_file, outputfile, verbosity_on, reset_database):
     ''' Generate csv tables from shapefile in a given directory,
     use given configurations to interact with POSTGRESQL to execute POSTGIS actions. '''
 
@@ -107,6 +126,8 @@ def process_shapefiles(directory_path, configuration_file, verbosity_on, reset_d
     
     print(sgraph)
     fclrprint('Segmentation finished!', 'g')
+    channel_inst.export_geom_table_to_file(outputfile.replace('.jl', '.geom.jl'))
+    sgraph.export_segments_jl_file(outputfile.replace('.jl', '.seg.jl'))
 
 if __name__ == '__main__':
     main()

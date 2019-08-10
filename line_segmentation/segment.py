@@ -10,7 +10,8 @@ from json import load
 from psycopg2 import connect, Error as psycopg2_error
 from psycopg2.extensions import AsIs
 from postgis_sqls import sqlstr_reset_all_tables, sqlstr_op_records, \
-                        sqlstr_create_gid_geom_table, sqlstr_insert_new_record_to_geom_table
+                        sqlstr_create_gid_geom_table, sqlstr_insert_new_record_to_geom_table, \
+                        sqlstr_export_geom_table_to_file
 from osgeo.ogr import Open as ogr_open
 
 OPERATION_INTERSECT = 'ST_INTERSECTION'
@@ -217,3 +218,15 @@ class PostGISChannel:
         # commit changes
         self.connection.commit()
         fclrprint(f'Reset tables finished', 'c')
+
+    def export_geom_table_to_file(self, geometry_output_jl):
+        ''' Export the geometry file to some json-lines file. '''
+
+        export_sql = sqlstr_export_geom_table_to_file(self.geom_table_name, geometry_output_jl)
+        cur = self.connection.cursor()
+        cur.execute(export_sql)
+        self.pgcprint(cur.query.decode())
+        # commit changes
+        self.connection.commit()
+        fclrprint(f'Exported geomtery info to file {geometry_output_jl}', 'c')
+
