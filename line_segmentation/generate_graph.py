@@ -118,7 +118,7 @@ def main():
       lm_graph.dt.serialize(args.output_file, format="turtle")
       fclrprint(f'Done, generated ttl file {args.output_file}!', 'g')
   else:
-      fclrprint(f'Geometry and Relations files were not provided.', 'r')
+      fclrprint(f'Geometry, segments and relations files were not provided.', 'r')
       exit(1)
 
 if __name__ == '__main__':

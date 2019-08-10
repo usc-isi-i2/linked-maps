@@ -63,9 +63,12 @@ class Segment:
         cur = self.pgchannel.connection.cursor()
         cur.execute(sql_op_segments)
         self.pgchannel.pgcprint(cur.query.decode())
-        fetched_entry = cur.fetchone()
+        fetchall = cur.fetchall()
+        print(f'fetchall={fetchall}')
+        if len(fetchall) > 1:
+            raise ValueError("Fetched too many entries (should be 0 or 1)")
         try:
-            new_gid = fetched_entry[0]
+            new_gid = fetchall[0][0]
             new_seg = Segment(self.pgchannel, new_gid, new_name)
             return new_seg
         except:
@@ -148,7 +151,12 @@ class Segment:
         cur.execute(sql_insert_new_segment)
         pg_channel_obj.pgcprint(cur.query.decode())
 
-        gid = cur.fetchone()[0]
+        fetchall = cur.fetchall()
+        print(f'fetchall={fetchall}')
+        if len(fetchall) != 1:
+            raise ValueError("Fetched zero or more entries (should be exactly 1)")
+        gid = fetchall[0][0]
+
         cur.execute(f'DROP TABLE {AsIs(working_segment_table_name)}')
         pg_channel_obj.pgcprint(cur.query.decode())
 
