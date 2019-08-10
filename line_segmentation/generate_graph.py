@@ -112,7 +112,7 @@ def main():
       with open(args.relations_file) as read_file:
         for line_r in read_file:
           rel_dict = loads(line_r)
-          lm_graph.add_geo_child_to_parent(rel_dict['par_gid'], rel_dict['chi_gid'])
+          lm_graph.add_geo_child_to_parent(rel_dict['parent_gid'], rel_dict['child_gid'])
 
       # materialize triples
       lm_graph.dt.serialize(args.output_file, format="turtle")

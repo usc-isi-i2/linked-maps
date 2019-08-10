@@ -44,6 +44,11 @@ class SegmentsGraph:
             repr_str += str(seg) + '\n'
         return repr_str
 
+    def export_geom_jl_file(self, geom_outputfile):
+        ''' Export geometry mapping file to json-lines file '''
+
+        self.pgchannel.export_geom_table_to_file(geom_outputfile)
+
     def export_segments_jl_file(self, seg_outputfile):
         ''' Export segments list to json-lines file '''
 
@@ -57,9 +62,21 @@ class SegmentsGraph:
                 if '_' not in seg.name:
                     seg_yrs.append(seg.name[0:4])
                 line_dict['years'] = seg_yrs
-                # serialize constructed dictionary to an output JSON-line
+
                 write_file.write(dumps(line_dict) + '\n')
         fclrprint(f'Exported segments info to file {seg_outputfile}', 'c')
+
+    def export_relations_jl_file(self, rel_outputfile):
+        ''' Export relations list to json-lines file '''
+
+        with open(rel_outputfile, 'w') as write_file:
+            for seg in self.sg:
+                for child_gid in seg.children.keys():
+                    line_dict = OrderedDict()
+                    line_dict['parent_gid'] = seg.gid
+                    line_dict['child_gid'] = child_gid
+                    write_file.write(dumps(line_dict) + '\n')
+        fclrprint(f'Exported realtions info to file {rel_outputfile}', 'c')
 
     def add_segment_to_graph(self, segment):
         ''' Add segment to the graph. '''
@@ -126,8 +143,9 @@ def process_shapefiles(directory_path, configuration_file, outputfile, verbosity
     
     print(sgraph)
     fclrprint('Segmentation finished!', 'g')
-    channel_inst.export_geom_table_to_file(outputfile.replace('.jl', '.geom.jl'))
+    sgraph.export_geom_jl_file(outputfile.replace('.jl', '.geom.jl'))
     sgraph.export_segments_jl_file(outputfile.replace('.jl', '.seg.jl'))
+    sgraph.export_relations_jl_file(outputfile.replace('.jl', '.rel.jl'))
 
 if __name__ == '__main__':
     main()
