@@ -1,0 +1,3 @@
+[submodule "mykgutils"]
+	path = mykgutils
+	url = https://github.com/basels/mykgutils
