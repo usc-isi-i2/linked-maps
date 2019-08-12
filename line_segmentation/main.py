@@ -94,11 +94,11 @@ class SegmentsGraph:
                 fclrprint(f'[{int_seg.gid}] = [{leaf_seg.gid}] ∩ [{segment.gid}]', 'p')
                 self.sg.append(int_seg)
                 list_of_leaf_gids.append(int_seg.gid)
-            # leaf    minus intersection
-            leaf_min_int = leaf_seg.minus(int_seg, f'm_{leaf_seg.name}_{int_seg.name}')
-            if leaf_min_int:
-                fclrprint(f'[{leaf_min_int.gid}] = [{leaf_seg.gid}] \\ [{int_seg.gid}]', 'p')
-                self.sg.append(leaf_min_int)
+                # leaf minus intersection (if intersection is not empty)
+                leaf_min_int = leaf_seg.minus(int_seg, f'm_{leaf_seg.name}_{int_seg.name}')
+                if leaf_min_int:
+                    fclrprint(f'[{leaf_min_int.gid}] = [{leaf_seg.gid}] \\ [{int_seg.gid}]', 'p')
+                    self.sg.append(leaf_min_int)
 
         if list_of_leaf_gids:
             # segment minus union-of-intersections
