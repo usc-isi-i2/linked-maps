@@ -1,6 +1,11 @@
 from os.path import abspath
 from psycopg2.extensions import AsIs
 
+OPERATION_INTERSECT = 'ST_INTERSECTION'
+OPERATION_UNION = 'ST_UNION'
+OPERATION_MINUS = 'ST_DIFFERENCE'
+OPERATION_DIFF_W_UNION = 'INTERNAL_DIFF_W_UNION'
+
 def sqlstr_reset_all_tables(geom_tablename, srid):
     ''' Get SQL string to reset tables (geom). '''
 
@@ -16,34 +21,59 @@ def sqlstr_reset_all_tables(geom_tablename, srid):
 
 def sqlstr_op_records(operation, geom_tablename, segment_1_gid, list_of_gids, buffer_size):
     ''' Get SQL string to perform operation 'op' between two records . '''
-    
-    sql_substring = sqlstr_build_or_clause_of_gids(geom_tablename, list_of_gids)
+
+    sub_op = operation
+    if operation == OPERATION_DIFF_W_UNION:
+        sub_op = OPERATION_MINUS
 
     sql_str = f'''
-        INSERT INTO {AsIs(geom_tablename)} (wkt, geom) 
+        INSERT INTO {AsIs(geom_tablename)} (wkt, geom)
         SELECT ST_ASTEXT(res.lr), lr
         FROM(
-            SELECT ST_MULTI(ST_INTERSECTION(
-                l.geom, 
-                {operation}(
-                    st_buffer(l.geom, {buffer_size}), 
-                    st_buffer(r.geom, {buffer_size}))         
-            )) as lr
-            FROM 
-                (
+            SELECT ST_MULTI(
+                ST_INTERSECTION(
+                    l.geom,
+                    {sub_op}(
+                        st_buffer(l.geom, {buffer_size}),
+                        st_buffer(r.geom, {buffer_size})
+                    )
+                )
+            ) as lr
+            FROM (
                 SELECT geom
                 FROM {AsIs(geom_tablename)}
                 WHERE {AsIs(geom_tablename)}.gid = {segment_1_gid}
-                ) as l,
-                (
+            ) as l,
+        '''
+
+    gid_2_sql_substring = sqlstr_build_or_clause_of_gids(geom_tablename, list_of_gids)
+
+    if operation == OPERATION_DIFF_W_UNION:
+        sql_str += f'''
+            (
+                SELECT ST_Multi(ST_Union(f.geom)) as geom
+                FROM (
+                    SELECT geom
+                    FROM {AsIs(geom_tablename)}
+                    WHERE {gid_2_sql_substring}
+                ) as f
+            ) as r
+        '''
+    else:
+        sql_str += f'''
+            (
                 SELECT geom
                 FROM {AsIs(geom_tablename)}
-                WHERE {sql_substring}
-                ) as r
+                WHERE {gid_2_sql_substring}
+            ) as r
+        '''
+
+    sql_str += f'''
         ) res
         where ST_geometrytype(res.lr) = 'ST_MultiLineString'
         RETURNING gid
         '''
+
     return sql_str
 
 def sqlstr_create_gid_geom_table(active_tablename, srid):

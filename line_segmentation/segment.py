@@ -9,14 +9,11 @@ from mykgutils import fclrprint
 from json import load
 from psycopg2 import connect, Error as psycopg2_error
 from psycopg2.extensions import AsIs
-from postgis_sqls import sqlstr_reset_all_tables, sqlstr_op_records, \
+from postgis_sqls import OPERATION_DIFF_W_UNION, OPERATION_INTERSECT, OPERATION_UNION, OPERATION_MINUS, \
+                        sqlstr_reset_all_tables, sqlstr_op_records, \
                         sqlstr_create_gid_geom_table, sqlstr_insert_new_record_to_geom_table, \
                         sqlstr_export_geom_table_to_file
 from osgeo.ogr import Open as ogr_open
-
-OPERATION_INTERSECT = 'ST_INTERSECTION'
-OPERATION_UNION = 'ST_UNION'
-OPERATION_MINUS = 'ST_DIFFERENCE'
 
 def verify(func):
     '''wrapper function used to verify necessary information
@@ -112,7 +109,7 @@ class Segment:
     def minus_union_of_segments(self, list_of_other_segs, new_name, buff=0.0015):
         ''' Minus the segment class with a list of additional segments. '''
 
-        new_seg = self.perform_sql_op(list_of_other_segs, new_name, OPERATION_MINUS, buff)
+        new_seg = self.perform_sql_op(list_of_other_segs, new_name, OPERATION_DIFF_W_UNION, buff)
 
         if new_seg:
             self.children[new_seg.gid] = new_seg
