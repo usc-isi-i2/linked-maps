@@ -1,7 +1,7 @@
 {
-    "dbname": "linkedmap",
-    "user": "baselshbita",
-    "host": "localhost",
+    "dbname": "linkedmaps",
+    "user": "postgres",
+    "host": "",
     "geom_table_name": "geomerty",
     "SRID": 4269
 }
