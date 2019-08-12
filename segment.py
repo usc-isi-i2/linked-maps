@@ -15,6 +15,9 @@ from postgis_sqls import OPERATION_DIFF_W_UNION, OPERATION_INTERSECT, OPERATION_
                         sqlstr_export_geom_table_to_file
 from osgeo.ogr import Open as ogr_open
 
+# -------------------- DEBUG ONLY ---------------------
+GLOBAL_COUNTER = 0
+
 def verify(func):
     '''wrapper function used to verify necessary information
     before doing intersect, union etc operation. '''
@@ -136,13 +139,29 @@ class Segment:
         INSERT INTO %s (geom) VALUES (ST_MULTI(ST_GeometryFromText(%s, %s)))
         '''
 
+        # -------------------- DEBUG ONLY ---------------------------
+        global GLOBAL_COUNTER
+        GLOBAL_COUNTER += 1
+        if GLOBAL_COUNTER == 1:
+            wkt = 'LINESTRING (-118.44259500278235 33.98456150282233,-118.43306779636146 33.975842755729126,-118.428304193151 33.98196376558386)'
+        elif GLOBAL_COUNTER == 2:
+            wkt = 'LINESTRING(-118.41718911899329 33.99580558664377,-118.43306779636146 33.975842755729126,-118.42637300266028 33.966055341841916)'
+        elif GLOBAL_COUNTER == 3:
+            wkt = 'LINESTRING(-118.44877481235267 33.957939831868956,-118.43306779636146 33.975842755729126,-118.41367006076575 33.95366819986043)'
+        else:
+            wkt = 'LINESTRING(-118.44087838901282 33.96676719174423,-118.43315362704993 33.975771578603826,-118.45212220920325 33.994382367142336,-118.44508409274817 33.998865427838126)'
+        cur.execute(sql_insert_geom_values_to_table, (AsIs(working_segment_table_name), wkt, pg_channel_obj.SRID))
+        pg_channel_obj.pgcprint(cur.query.decode())
+        # -------------------- DEBUG ONLY ---------------------------
+        '''
+
         total_feature_count_in_map = layer.GetFeatureCount()
         for i in range(total_feature_count_in_map):
             feature = layer.GetFeature(i)
             wkt = feature.GetGeometryRef().ExportToWkt()
             cur.execute(sql_insert_geom_values_to_table, (AsIs(working_segment_table_name), wkt, pg_channel_obj.SRID))
         pg_channel_obj.pgcprint(f'.... Added {total_feature_count_in_map} geometry lines (records) to {working_segment_table_name}')
-        
+        '''
 
         sql_insert_new_segment = sqlstr_insert_new_record_to_geom_table(pg_channel_obj.geom_table_name, working_segment_table_name)
         cur.execute(sql_insert_new_segment)
