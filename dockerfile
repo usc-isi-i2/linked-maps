@@ -40,3 +40,6 @@ COPY ./line_segmentation /linked-maps
 COPY ./gen_ttl_from_csv/construct_triples.py /linked-maps
 
 USER postgres
+
+# TODO: run the following inside the container as postgres user:
+# 1. `/etc/init.d/postgresql start && createdb linkedmaps && psql linkedmaps -c "CREATE EXTENSION Postgis;"` 
