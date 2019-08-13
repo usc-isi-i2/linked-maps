@@ -29,12 +29,12 @@ spatial:SpatialIndexLucene  rdfs:subClassOf   spatial:SpatialIndex .
     .
 
 <#dataset> rdf:type      tdb:DatasetTDB ;
-    tdb:location "/jena-fuseki/run/databases/spatial_data"     .
-    
+    tdb:location "/Users/baselshbita/repos/apache-jena-fuseki-3.8.0/run/databases/spatial_data"     .
+
 <#indexLucene> a spatial:SpatialIndexLucene ;
     #spatial:directory <file:Lucene> ;
     #spatial:directory "mem" ;
-    spatial:directory <file:/jena-fuseki/run/databases/spatial_data/spatial> ;
+    spatial:directory </Users/baselshbita/repos/apache-jena-fuseki-3.8.0/run/databases/spatial_data/spatial> ;
     spatial:definition <#definition> ;
     .
 
