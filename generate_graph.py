@@ -88,7 +88,7 @@ class LinkedMapGraph:
 
 def main():
 
-  ap = ArgumentParser(description=f'Process line segmetation output files (jl) and generate (ttl) file containing triples.\n\tUSAGE: python {basename(__file__)} -g GEOMETRY_FILE -s SEGMENTS_FILE -r RELATIONS_FILE')
+  ap = ArgumentParser(description='Process line segmetation output files (jl) and generate (ttl) file containing triples.\n\tUSAGE: python %s -g GEOMETRY_FILE -s SEGMENTS_FILE -r RELATIONS_FILE' % (basename(__file__)))
   ap.add_argument('-g', '--geometry_file', help='File (jl) holding the geometry info.', type=str)
   ap.add_argument('-s', '--segments_file', help='File (jl) holding th relations info (parents, children).', type=str)
   ap.add_argument('-r', '--relations_file', help='File (jl) holding th relations info (parents, children).', type=str)
@@ -97,7 +97,7 @@ def main():
   args = ap.parse_args()
 
   if args.geometry_file and args.relations_file and args.segments_file:
-      fclrprint(f'Going to process files {args.geometry_file}, {args.segments_file}, {args.relations_file}...')
+      fclrprint('Going to process files %s, %s, %s...' % (args.geometry_file, args.segments_file, args.relations_file))
       
       # initialize graph with gid-to-wkt mapping file
       lm_graph = LinkedMapGraph(args.geometry_file)
@@ -116,9 +116,9 @@ def main():
 
       # materialize triples
       lm_graph.dt.serialize(args.output_file, format="turtle")
-      fclrprint(f'Done, generated ttl file {args.output_file}!', 'g')
+      fclrprint('Done, generated ttl file %s!' % (args.output_file), 'g')
   else:
-      fclrprint(f'Geometry, segments and relations files were not provided.', 'r')
+      fclrprint('Geometry, segments and relations files were not provided.', 'r')
       exit(1)
 
 if __name__ == '__main__':

@@ -12,7 +12,7 @@ from collections import OrderedDict
 
 def main():
 
-    ap = ArgumentParser(description=f'Process shapefiles (vector data) and generate (jl) files with line segmentation info.\n\tUSAGE: python {basename(__file__)} -d DIR_NAME -c CONFIG_FILE')
+    ap = ArgumentParser(description='Process shapefiles (vector data) and generate (jl) files with line segmentation info.\n\tUSAGE: python %s -d DIR_NAME -c CONFIG_FILE' % (basename(__file__)))
     ap.add_argument('-d', '--dir_name', help='Directory path with shapefiles.', type=str)
     ap.add_argument('-c', '--config_file', help='Input configuration file.', type=str)
     ap.add_argument('-o', '--output_file', help='Output geometry file (jl).', default='line_seg.jl', type=str)
@@ -21,10 +21,11 @@ def main():
     args = ap.parse_args()
 
     if args.dir_name and args.config_file:
-        fclrprint(f'Going to process shapefiles in dir {args.dir_name} using configurations from file {args.config_file}...')
+        fclrprint('Going to process shapefiles in dir %s using configurations from file %s...' \
+                  % (args.dir_name, args.config_file))
         process_shapefiles(args.dir_name, args.config_file, args.output_file, args.debug_prints, args.reset_db)
     else:
-        fclrprint(f'Input directory and configuration file were not provided.', 'r')
+        fclrprint('Input directory and configuration file were not provided.', 'r')
         exit(1)
 
 class SegmentsGraph:
@@ -64,7 +65,7 @@ class SegmentsGraph:
                 line_dict['years'] = seg_yrs
 
                 write_file.write(dumps(line_dict) + '\n')
-        fclrprint(f'Exported segments info to file {seg_outputfile}', 'c')
+        fclrprint('Exported segments info to file %s' % (seg_outputfile), 'c')
 
     def export_relations_jl_file(self, rel_outputfile):
         ''' Export relations list to json-lines file '''
@@ -76,7 +77,7 @@ class SegmentsGraph:
                     line_dict['parent_gid'] = seg.gid
                     line_dict['child_gid'] = child_gid
                     write_file.write(dumps(line_dict) + '\n')
-        fclrprint(f'Exported realtions info to file {rel_outputfile}', 'c')
+        fclrprint('Exported realtions info to file %s' % (rel_outputfile), 'c')
 
     def add_segment_to_graph(self, segment):
         ''' Add segment to the graph. '''
@@ -89,22 +90,22 @@ class SegmentsGraph:
         list_of_leaf_gids = list()
         for leaf_seg in leaves:
             # intersect
-            int_seg = leaf_seg.intersect(segment, f'i_{leaf_seg.name}_{segment.name}')
+            int_seg = leaf_seg.intersect(segment, 'i_%s_%s' % (leaf_seg.name, segment.name))
             if int_seg:
-                fclrprint(f'[{int_seg.gid}] = [{leaf_seg.gid}] ∩ [{segment.gid}]', 'p')
+                fclrprint('[%d] = [%d] ∩ [%d]' % (int_seg.gid, leaf_seg.gid, segment.gid), 'p')
                 self.sg.append(int_seg)
                 list_of_leaf_gids.append(int_seg.gid)
                 # leaf minus intersection (if intersection is not empty)
-                leaf_min_int = leaf_seg.minus(int_seg, f'm_{leaf_seg.name}_{int_seg.name}')
+                leaf_min_int = leaf_seg.minus(int_seg, 'm_%s_%s' % (leaf_seg.name, int_seg.name))
                 if leaf_min_int:
-                    fclrprint(f'[{leaf_min_int.gid}] = [{leaf_seg.gid}] \\ [{int_seg.gid}]', 'p')
+                    fclrprint('[%d] = [%d] \\ [%d]' % (leaf_min_int.gid, leaf_seg.gid, int_seg.gid), 'p')
                     self.sg.append(leaf_min_int)
 
         if list_of_leaf_gids:
             # segment minus union-of-intersections
-            segment_min_union_ints = segment.minus_union_of_segments(list_of_leaf_gids, f'mu_{segment.name}_UL')
+            segment_min_union_ints = segment.minus_union_of_segments(list_of_leaf_gids, 'mu_%s_UL' % (segment.name))
             if segment_min_union_ints:
-                fclrprint(f'[{segment_min_union_ints.gid}] = [{segment.gid}] \\ ∪∊{list_of_leaf_gids}', 'p')
+                fclrprint('[%d] = [%d] \\ ∪∊%s' % (segment_min_union_ints.gid, segment.gid, str(list_of_leaf_gids)), 'p')
                 self.sg.append(segment_min_union_ints)
         
         # commit changes
@@ -117,7 +118,7 @@ class SegmentsGraph:
         for seg in self.sg:
             if len(seg.children) == 0:
                 list_of_leaf_nodes.append(seg)
-                fclrprint(f'leaf [{seg}]', 'p')
+                fclrprint('leaf [%s]' % (str(seg)), 'p')
         return list_of_leaf_nodes
 
 def process_shapefiles(directory_path, configuration_file, outputfile, verbosity_on, reset_database):
@@ -132,14 +133,14 @@ def process_shapefiles(directory_path, configuration_file, outputfile, verbosity
         if fname.endswith(".shp"):
             fname_no_ext = fname.split('.shp')[0]
             full_fname = directory_path + '/' + fname
-            fclrprint(f'Processing {full_fname}', 'c')
+            fclrprint('Processing %s' % (full_fname), 'c')
             try:
                 seg = Segment.from_shapefile(full_fname, channel_inst, fname_no_ext)
                 sgraph.add_segment_to_graph(seg)
             except Exception as e:
-                fclrprint(f'Failed processing file {full_fname}\n{str(e)}', 'r')
+                fclrprint('Failed processing file %s\n%s' % (full_fname, str(e)), 'r')
                 exit(-1)
-            fclrprint(f'Took {str(timedelta(seconds=int(time() - start_time))).zfill(8)}', 'c')
+            fclrprint('Took %s' % (str(timedelta(seconds=int(time() - start_time))).zfill(8)), 'c')
     
     print(sgraph)
     fclrprint('Segmentation finished!', 'g')

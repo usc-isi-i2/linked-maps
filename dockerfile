@@ -36,9 +36,15 @@ WORKDIR /linked-maps
 # switch to user 'postgres'
 USER postgres
 
+# expose port 5432
+# EXPOSE 5432
+# createdb: could not connect to database template1: could not connect to server: No such file or directory
+#    Is the server running locally and accepting
+#    connections on Unix domain socket "/var/run/postgresql/.s.PGSQL.5432"?
+
 # initiate postgresql service
 RUN /etc/init.d/postgresql start
 
 # create database with postgis extension
-RUN createdb linkedmaps
-RUN psql linkedmaps -c "CREATE EXTENSION Postgis;"
+# RUN createdb linkedmaps
+# RUN psql linkedmaps -c "CREATE EXTENSION Postgis;"

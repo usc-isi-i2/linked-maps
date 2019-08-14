@@ -50,7 +50,8 @@ class Segment:
     def __repr__(self):
         ''' Print string for segment class. '''
 
-        return f'name: {self.name}, gid: {self.gid}, parents: {self.parents.keys()}, children: {self.children.keys()}'
+        return 'name: %s, gid: %s, parents: %s, children: %s' \
+        % (self.name, self.gid, str(self.parents.keys()), str(self.children.keys()))
 
     def perform_sql_op(self, list_of_other_gids, new_name, operation, buff=0.0015):
         ''' Performs an operation on the segment class with an additional segment,
@@ -61,7 +62,7 @@ class Segment:
         cur.execute(sql_op_segments)
         self.pgchannel.pgcprint(cur.query.decode())
         fetchall = cur.fetchall()
-        print(f'fetchall={fetchall}')
+        print('fetchall: %s' % (fetchall))
         if len(fetchall) > 1:
             raise ValueError("Fetched too many entries (should be 0 or 1)")
         try:
@@ -135,30 +136,31 @@ class Segment:
         sql_insert_geom_values_to_table = '''
         INSERT INTO %s (geom) VALUES (ST_MULTI(ST_GeometryFromText(%s, %s)))
         '''
-
+        
         total_feature_count_in_map = layer.GetFeatureCount()
         for i in range(total_feature_count_in_map):
             feature = layer.GetFeature(i)
             wkt = feature.GetGeometryRef().ExportToWkt()
             cur.execute(sql_insert_geom_values_to_table, (AsIs(working_segment_table_name), wkt, pg_channel_obj.SRID))
-        pg_channel_obj.pgcprint(f'.... Added {total_feature_count_in_map} geometry lines (records) to {working_segment_table_name}')
+        pg_channel_obj.pgcprint('.... Added %s geometry lines (records) to %s' \
+                                % (total_feature_count_in_map, working_segment_table_name))
 
         sql_insert_new_segment = sqlstr_insert_new_record_to_geom_table(pg_channel_obj.geom_table_name, working_segment_table_name)
         cur.execute(sql_insert_new_segment)
         pg_channel_obj.pgcprint(cur.query.decode())
 
         fetchall = cur.fetchall()
-        print(f'fetchall={fetchall}')
+        print('fetchall: %s' % (fetchall))
         if len(fetchall) != 1:
             raise ValueError("Fetched zero or more entries (should be exactly 1)")
         gid = fetchall[0][0]
 
-        cur.execute(f'DROP TABLE {AsIs(working_segment_table_name)}')
+        cur.execute('DROP TABLE %s' % (AsIs(working_segment_table_name)))
         pg_channel_obj.pgcprint(cur.query.decode())
 
         # commit changes
         pg_channel_obj.connection.commit()
-        fclrprint(f'Created {name} from {path}', 'c')
+        fclrprint('Created %s from %s' % (name, path), 'c')
 
         seg = cls(pg_channel_obj, gid, name)
         return seg
@@ -197,7 +199,8 @@ class PostGISChannel:
             self.connection = connect(dbname=self.dbname,
                                       user=self.user,
                                       host=self.host)
-            fclrprint(f'Connection established to {self.dbname} [{self.user}@{self.host}]', 'g')
+            fclrprint('Connection established to %s [%s@%s]'
+                      % (self.dbname, self.user, self.host), 'g')
         except psycopg2_error as e:
             print("Unable to connect to the database: %s" % str(e))
             exit(-1)
@@ -221,7 +224,7 @@ class PostGISChannel:
         self.pgcprint(cur.query.decode())
         # commit changes
         self.connection.commit()
-        fclrprint(f'Reset tables finished', 'c')
+        fclrprint('Reset tables finished', 'c')
 
     def export_geom_table_to_file(self, geometry_output_jl):
         ''' Export the geometry file to some json-lines file. '''
@@ -232,5 +235,5 @@ class PostGISChannel:
         self.pgcprint(cur.query.decode())
         # commit changes
         self.connection.commit()
-        fclrprint(f'Exported geomtery info to file {geometry_output_jl}', 'c')
+        fclrprint('Exported geomtery info to file %s' % (geometry_output_jl), 'c')
 
