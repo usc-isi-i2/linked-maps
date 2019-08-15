@@ -25,9 +25,8 @@ RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt xenial-pgdg main" >
     apt-get install -y postgresql-11-postgis-scripts && \
     apt-get install -y postgis
 
-# update pip and install rdflib
-RUN python3.5 -m pip install pip --upgrade && \
-    pip install setuptools rdflib psycopg2-binary
+# update pip
+RUN python3.5 -m pip install pip --upgrade
 
 # set working directory to /linked-maps
 COPY ./ /linked-maps
@@ -36,16 +35,17 @@ WORKDIR /linked-maps
 # install additional requirements
 RUN pip3.5 install -r requirements.txt
 
-# initiate postgresql service
-# RUN /etc/init.d/postgresql start
+# grant access to all users for 'results' dir
+RUN chmod 777 results
 
 # switch to user 'postgres'
-# USER postgres
+USER postgres
 
-# create database with postgis extension
-# RUN createdb linkedmaps
-# RUN psql linkedmaps -c "CREATE EXTENSION Postgis;"
-
-# run line-segmentation and generate triples
-# RUN python3.5 main.py -d maps -c config.json -r -o /tmp/line_seg.jl
-# RUN python3.5 generate_graph.py -g /tmp/line_seg.geom.jl -s /tmp/line_seg.seg.jl -r /tmp/line_seg.rel.jl -o /tmp/linked_maps_graph.ttl
+# initiate postgresql service and create database with postgis extension
+# then run line-segmentation and generate triples
+CMD /etc/init.d/postgresql start && \
+    createdb linkedmaps && \
+    psql linkedmaps -c "CREATE EXTENSION Postgis;" && \
+    python3.5 main.py -d maps -c config.json -r -o results/line_seg.jl && \
+    python3.5 generate_graph.py -g results/line_seg.geom.jl -s results/line_seg.seg.jl -r results/line_seg.rel.jl -o results/linked_maps_graph.ttl &&
+    ls -l results

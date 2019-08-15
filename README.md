@@ -42,13 +42,6 @@ python generate_graph.py -g /path/to/geometry/file -s /path/to/segments/file -r 
 ```
 For example: `python generate_graph.py -g line_seg.geom.jl -s line_seg.seg.jl -r line_seg.rel.jl`
 
-
-If the generated ttl file is on the docker container, you can copy the file to the host:
-```
-docker cp <containerId>:/file/path/within/container /host/path/target
-```
-For example: `docker cp 9abe8ca7bc48:/tmp/linked_maps_graph.ttl /tmp/`
-
 <!--
 
 Finalize Visualization! Revise this:
@@ -64,3 +57,18 @@ upload the `lnkd_mp_grph.ttl` found in the current working directory
 Now you can run SPARQL queries under "dataset" section
 
     -->
+
+## Docker
+
+Build image:
+```
+docker build -t linked-maps .
+```
+
+The generated ttl file will be dumped to `results` folder on the container upon finishing. It is recommended to set a shared volume between the host and the container in order to obtain access to the output files:
+```
+docker run -v /volume/on/your/host/machine:/volume/on/container linked-maps:latest
+```
+For example: `docker run -v /tmp/results:/linked-maps/results -it linked-maps:latest`
+Make sure that the volume you're using (on your local machine) has 'File Sharing' enabled in the Docker settings.
+
