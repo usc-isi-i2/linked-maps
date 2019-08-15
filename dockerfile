@@ -35,8 +35,8 @@ WORKDIR /linked-maps
 # install additional requirements
 RUN pip3.5 install -r requirements.txt
 
-# grant access to all users for 'results' dir
-RUN chmod 777 results
+# create 'results' dir and grant access to it for all users
+RUN mkdir results && chmod 777 results
 
 # switch to user 'postgres'
 USER postgres
