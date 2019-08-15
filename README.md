@@ -60,15 +60,20 @@ Now you can run SPARQL queries under "dataset" section
 
 ## Docker
 
+Prior to building the image (and running the container), map shapefiles (`*.shp, *.shx`) should be inserted in `maps` directory.
+
 Build image:
 ```
 docker build -t linked-maps .
 ```
 
-The generated ttl file will be dumped to `results` folder on the container upon finishing. It is recommended to set a shared volume between the host and the container in order to obtain access to the output files:
+The generated ttl file will be dumped to `results` directory on the container upon finishing. It is recommended to set a shared volume between the host and the container in order to obtain access to the output files:
 ```
 docker run -v /volume/on/your/host/machine:/volume/on/container linked-maps:latest
 ```
-For example: `docker run -v /tmp/results:/linked-maps/results -it linked-maps:latest`
-Make sure that the volume you're using (on your local machine) has 'File Sharing' enabled in the Docker settings.
+For example: `docker run -v /home/shbita/linked-maps/res:/linked-maps/results -it linked-maps:latest`
+Make sure that:
+1. The volume you're using (on your local machine) has 'File Sharing' enabled in the Docker settings.
+2. You're using full paths (on both local machine and docker container)
+3. The user running the docker command has access privlege (can be done by `sudo chmod 777 /volume/on/your/host/machine`)
 
