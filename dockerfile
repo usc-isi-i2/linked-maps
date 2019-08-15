@@ -33,18 +33,19 @@ RUN python3.5 -m pip install pip --upgrade && \
 COPY ./ /linked-maps
 WORKDIR /linked-maps
 
-# switch to user 'postgres'
-USER postgres
-
-# expose port 5432
-# EXPOSE 5432
-# createdb: could not connect to database template1: could not connect to server: No such file or directory
-#    Is the server running locally and accepting
-#    connections on Unix domain socket "/var/run/postgresql/.s.PGSQL.5432"?
+# install additional requirements
+RUN pip3.5 install -r requirements.txt
 
 # initiate postgresql service
-RUN /etc/init.d/postgresql start
+# RUN /etc/init.d/postgresql start
+
+# switch to user 'postgres'
+# USER postgres
 
 # create database with postgis extension
 # RUN createdb linkedmaps
 # RUN psql linkedmaps -c "CREATE EXTENSION Postgis;"
+
+# run line-segmentation and generate triples
+# RUN python3.5 main.py -d maps -c config.json -r -o /tmp/line_seg.jl
+# RUN python3.5 generate_graph.py -g /tmp/line_seg.geom.jl -s /tmp/line_seg.seg.jl -r /tmp/line_seg.rel.jl -o /tmp/linked_maps_graph.ttl

@@ -26,9 +26,9 @@ pip install psycopg2 osgeo
 5. Edit your config.json accordingly.
 6. Run this command
 ```
-python main.py -d /path/to/shapefiles/ -c /path/to/config/file -r
+python main.py -d /path/to/shapefiles/ -c /path/to/config/file -r -o /path/to/output/file
 ```
-For example:  `python main.py -d maps_partial -c config.json -r -v`
+For example:  `python main.py -d maps -c config.json -r -o /tmp/line_seg.jl`
 
 
 ## Modeling the data into RDF
@@ -42,6 +42,12 @@ python generate_graph.py -g /path/to/geometry/file -s /path/to/segments/file -r 
 ```
 For example: `python generate_graph.py -g line_seg.geom.jl -s line_seg.seg.jl -r line_seg.rel.jl`
 
+
+If the generated ttl file is on the docker container, you can copy the file to the host:
+```
+docker cp <containerId>:/file/path/within/container /host/path/target
+```
+For example: `docker cp 9abe8ca7bc48:/tmp/linked_maps_graph.ttl /tmp/`
 
 <!--
 

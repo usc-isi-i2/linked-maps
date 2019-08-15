@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 This class is a part of the line segmentation algorithm.
 This Segment class is abstraction of segments (nodes) in segmentation tree.

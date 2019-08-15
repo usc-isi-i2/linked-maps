@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from os.path import abspath
 from psycopg2.extensions import AsIs
 

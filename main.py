@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from argparse import ArgumentParser
 from os import listdir
 from os.path import basename
@@ -92,7 +94,7 @@ class SegmentsGraph:
             # intersect
             int_seg = leaf_seg.intersect(segment, 'i_%s_%s' % (leaf_seg.name, segment.name))
             if int_seg:
-                fclrprint('[%d] = [%d] ∩ [%d]' % (int_seg.gid, leaf_seg.gid, segment.gid), 'p')
+                fclrprint('[%d] = [%d] AND [%d]' % (int_seg.gid, leaf_seg.gid, segment.gid), 'p')
                 self.sg.append(int_seg)
                 list_of_leaf_gids.append(int_seg.gid)
                 # leaf minus intersection (if intersection is not empty)
@@ -105,7 +107,7 @@ class SegmentsGraph:
             # segment minus union-of-intersections
             segment_min_union_ints = segment.minus_union_of_segments(list_of_leaf_gids, 'mu_%s_UL' % (segment.name))
             if segment_min_union_ints:
-                fclrprint('[%d] = [%d] \\ ∪∊%s' % (segment_min_union_ints.gid, segment.gid, str(list_of_leaf_gids)), 'p')
+                fclrprint('[%d] = [%d] \\ UNION%s' % (segment_min_union_ints.gid, segment.gid, str(list_of_leaf_gids)), 'p')
                 self.sg.append(segment_min_union_ints)
         
         # commit changes
