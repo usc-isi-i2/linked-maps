@@ -16,6 +16,7 @@ from postgis_sqls import OPERATION_DIFF_W_UNION, OPERATION_INTERSECT, OPERATION_
                         sqlstr_create_gid_geom_table, sqlstr_insert_new_record_to_geom_table, \
                         sqlstr_export_geom_table_to_file
 from osgeo.ogr import Open as ogr_open
+from time import time
 
 def verify(func):
     '''wrapper function used to verify necessary information
@@ -40,12 +41,13 @@ def verify(func):
 class Segment:
     ''' Class representing a single segment (record in 'map' table on POSTGIS BE) '''
 
-    def __init__(self, pg_channel_obj, gid, name):
+    def __init__(self, pg_channel_obj, gid, name, node_gen_time_seconds):
         ''' Initialize Segment. '''
 
         self.pgchannel = pg_channel_obj
         self.gid = gid
         self.name = name
+        self.gen_time = node_gen_time_seconds
         self.parents = dict()  # { parentgid: Segment object }
         self.children = dict()  # { childgid: Segment object }
 
@@ -59,6 +61,7 @@ class Segment:
         ''' Performs an operation on the segment class with an additional segment,
         supported operations: OPERATION_INTERSECT, OPERATION_UNION, OPERATION_MINUS '''
 
+        start_time = time()
         sql_op_segments = sqlstr_op_records(operation, self.pgchannel.geom_table_name, self.gid, list_of_other_gids, buff)
         cur = self.pgchannel.connection.cursor()
         cur.execute(sql_op_segments)
@@ -68,7 +71,7 @@ class Segment:
             raise ValueError("Fetched too many entries (should be 0 or 1): fetchall: %s " % (fetchall))
         try:
             new_gid = fetchall[0][0]
-            new_seg = Segment(self.pgchannel, new_gid, new_name)
+            new_seg = Segment(self.pgchannel, new_gid, new_name, time() - start_time)
             return new_seg
         except:
             pass
@@ -123,6 +126,7 @@ class Segment:
     def from_shapefile(cls, path, pg_channel_obj, name):
         ''' Create a segment class from shapefile. '''
 
+        start_time = time()
         cur = pg_channel_obj.connection.cursor()
 
         working_segment_table_name = 'active_seg'
@@ -162,7 +166,7 @@ class Segment:
         pg_channel_obj.connection.commit()
         fclrprint('Created %s from %s' % (name, path), 'c')
 
-        seg = cls(pg_channel_obj, gid, name)
+        seg = cls(pg_channel_obj, gid, name, time() - start_time)
         return seg
 
 

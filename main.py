@@ -60,6 +60,7 @@ class SegmentsGraph:
                 line_dict = OrderedDict()
                 line_dict['gid'] = seg.gid
                 line_dict['name'] = seg.name
+                line_dict['gen_time'] = seg.gen_time
                 seg_yrs = list()
                 # TODO: mapping from name to year should be read from an external file
                 if '_' not in seg.name:
@@ -102,6 +103,10 @@ class SegmentsGraph:
                 if leaf_min_int:
                     fclrprint('[%d] = [%d] \\ [%d]' % (leaf_min_int.gid, leaf_seg.gid, int_seg.gid), 'p')
                     self.sg.append(leaf_min_int)
+                else:
+                    fclrprint('{} = [%d] \\ [%d]' % (leaf_seg.gid, int_seg.gid), 'gray')
+            else:
+                fclrprint('{} = [%d] AND [%d]' % (leaf_seg.gid, segment.gid), 'gray')
 
         if list_of_leaf_gids:
             # segment minus union-of-intersections
@@ -109,6 +114,8 @@ class SegmentsGraph:
             if segment_min_union_ints:
                 fclrprint('[%d] = [%d] \\ UNION%s' % (segment_min_union_ints.gid, segment.gid, str(list_of_leaf_gids)), 'p')
                 self.sg.append(segment_min_union_ints)
+            else:
+                fclrprint('{} = [%d] \\ UNION%s' % (segment.gid, str(list_of_leaf_gids)), 'gray')
         
         # commit changes
         self.pgchannel.connection.commit()
