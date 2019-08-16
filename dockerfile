@@ -46,6 +46,6 @@ USER postgres
 CMD /etc/init.d/postgresql start && \
     createdb linkedmaps && \
     psql linkedmaps -c "CREATE EXTENSION Postgis;" && \
-    python3.5 main.py -d maps -c config.json -r -o results/line_seg.jl && \
+    python3.5 main.py -d maps -c config.json -r -o results/line_seg.jl 2>&1 | tee results/line_seg.output.txt && \
     python3.5 generate_graph.py -g results/line_seg.geom.jl -s results/line_seg.seg.jl -r results/line_seg.rel.jl -o results/linked_maps_graph.ttl && \
     ls -l results
