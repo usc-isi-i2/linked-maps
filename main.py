@@ -3,12 +3,12 @@
 from argparse import ArgumentParser
 from os import listdir
 from os.path import basename
-from mykgutils import fclrprint
+from mykgutils import fclrprint, hash_string_md5
 from time import time
 from datetime import timedelta
 from segment import PostGISChannel, Segment
 from json import dumps
-from collections import OrderedDict 
+from collections import OrderedDict
 
 # --- entrypoint --------------------------------------------------------------
 
@@ -93,13 +93,13 @@ class SegmentsGraph:
         list_of_leaf_gids = list()
         for leaf_seg in leaves:
             # intersect
-            int_seg = leaf_seg.intersect(segment, 'i_%s_%s' % (leaf_seg.name, segment.name))
+            int_seg = leaf_seg.intersect(segment, str('i_' + hash_string_md5('i_%s_%s' % (leaf_seg.name, segment.name))))
             if int_seg:
                 fclrprint('[%d] = [%d] AND [%d]' % (int_seg.gid, leaf_seg.gid, segment.gid), 'p')
                 self.sg.append(int_seg)
                 list_of_leaf_gids.append(int_seg.gid)
                 # leaf minus intersection (if intersection is not empty)
-                leaf_min_int = leaf_seg.minus(int_seg, 'm_%s_%s' % (leaf_seg.name, int_seg.name))
+                leaf_min_int = leaf_seg.minus(int_seg, str('m_' + hash_string_md5('m_%s_%s' % (leaf_seg.name, int_seg.name))))
                 if leaf_min_int:
                     fclrprint('[%d] = [%d] \\ [%d]' % (leaf_min_int.gid, leaf_seg.gid, int_seg.gid), 'p')
                     self.sg.append(leaf_min_int)
@@ -110,7 +110,7 @@ class SegmentsGraph:
 
         if list_of_leaf_gids:
             # segment minus union-of-intersections
-            segment_min_union_ints = segment.minus_union_of_segments(list_of_leaf_gids, 'mu_%s_UL' % (segment.name))
+            segment_min_union_ints = segment.minus_union_of_segments(list_of_leaf_gids, str('mu_' + hash_string_md5('mu_%s_UL' % (segment.name))))
             if segment_min_union_ints:
                 fclrprint('[%d] = [%d] \\ UNION%s' % (segment_min_union_ints.gid, segment.gid, str(list_of_leaf_gids)), 'p')
                 self.sg.append(segment_min_union_ints)
@@ -140,6 +140,7 @@ def process_shapefiles(directory_path, configuration_file, outputfile, verbosity
     start_time = time()
     for fname in listdir(directory_path):
         if fname.endswith(".shp"):
+            it_start_time = time()
             fname_no_ext = fname.split('.shp')[0]
             full_fname = directory_path + '/' + fname
             fclrprint('Processing %s' % (full_fname), 'c')
@@ -149,7 +150,8 @@ def process_shapefiles(directory_path, configuration_file, outputfile, verbosity
             except Exception as e:
                 fclrprint('Failed processing file %s\n%s' % (full_fname, str(e)), 'r')
                 exit(-1)
-            fclrprint('Took %s' % (str(timedelta(seconds=int(time() - start_time))).zfill(8)), 'c')
+            fclrprint('Map addition took %s' % (str(timedelta(seconds=int(time() - it_start_time))).zfill(8)), 'c')
+            fclrprint('Total running time %s' % (str(timedelta(seconds=int(time() - start_time))).zfill(8)), 'c')
     
     print(sgraph)
     fclrprint('Segmentation finished!', 'g')

@@ -6,7 +6,7 @@ app = Flask(__name__)
 sparql = SPARQLWrapper("http://localhost:3030/spatial_data/sparql")
 sparql.setReturnFormat(JSON)
 
-DEFAULT_TERM = "2000"
+DEFAULT_TERM = "1958"
 
 SPARQL_PREFIXES = """
 prefix dcterms: <http://purl.org/dc/terms/>

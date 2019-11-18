@@ -147,8 +147,6 @@ class Segment:
             feature = layer.GetFeature(i)
             wkt = feature.GetGeometryRef().ExportToWkt()
             cur.execute(sql_insert_geom_values_to_table, (AsIs(working_segment_table_name), wkt, pg_channel_obj.SRID))
-        pg_channel_obj.pgcprint('.... Added %s geometry lines (records) to %s' \
-                                % (total_feature_count_in_map, working_segment_table_name))
 
         sql_insert_new_segment = sqlstr_insert_new_record_to_geom_table(pg_channel_obj.geom_table_name, working_segment_table_name)
         cur.execute(sql_insert_new_segment)
@@ -164,7 +162,7 @@ class Segment:
 
         # commit changes
         pg_channel_obj.connection.commit()
-        fclrprint('Created %s from %s' % (name, path), 'c')
+        fclrprint('Created %s from %s (%d geometry lines)' % (name, path, total_feature_count_in_map), 'c')
 
         seg = cls(pg_channel_obj, gid, name, time() - start_time)
         return seg
