@@ -139,7 +139,7 @@ def get_linkedgeodata_uris(segment, filter_key=''):
 
 def main():
 
-    ap = ArgumentParser(description='Process (jl) geometry file to acquire additional info from geo-coding services.\n\tUSAGE: python %s -g GEOMETRY_FILE' % (basename(__file__)))
+    ap = ArgumentParser(description='Process (jl) geometry file to acquire additional info from geo-coding services.\n\tUSAGE: python %s -g GEOMETRY_FILE -f FILTERING_KEY' % (basename(__file__)))
     ap.add_argument('-g', '--geometry_file', help='File (jl) holding the geometry info.', type=str)
     ap.add_argument('-f', '--filtering_key', help='String to filter OSM metadata by', default='', type=str)
     args = ap.parse_args()

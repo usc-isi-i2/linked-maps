@@ -34,7 +34,6 @@ class LinkedMapGraph:
     ''' Add a segment to the graph '''
 
     # geo:Feature
-    # TODO: need to hash the URI
     seg_feat_uri = URIRef(LMG[str(segment_gid)])
     self.dt.add((seg_feat_uri, RDF.type, GEO['Feature']))
 
@@ -60,7 +59,6 @@ class LinkedMapGraph:
     # TODO: add provenance information
     #   --prov:wasGeneratedBy--> prov:Activity
     #     --prov:wasAssociatedWith--> foaf:Organization, prov:Agent
-    # TODO: add Reverse Geocoding
     # TODO: add Positional Accuracy (buff)
 
   def add_geo_child_to_parent(self, parent_geo_feat_id, child_geo_feat_id):
@@ -88,12 +86,20 @@ class LinkedMapGraph:
     self.dt.remove((child_geo_feat_uri, DCTERMS['created'], None))
     self.dt.add((child_geo_feat_uri, DCTERMS['created'], Literal(d_now.isoformat(), datatype=XSD.dateTime)))
 
+  def add_linkedgeodata_uris_to_gid(self, geo_feat_id, list_of_lgd_uris):
+    ''' Link segment to additional LinkedGeoData URIs. '''
+
+    geo_feat_uri = URIRef(LMG[str(geo_feat_id)])
+    for lgd_uri in list_of_lgd_uris:
+      self.dt.add((geo_feat_uri, GEO['sfContains'], URIRef(lgd_uri)))
+
 def main():
 
-  ap = ArgumentParser(description='Process line segmetation output files (jl) and generate (ttl) file containing triples.\n\tUSAGE: python %s -g GEOMETRY_FILE -s SEGMENTS_FILE -r RELATIONS_FILE' % (basename(__file__)))
-  ap.add_argument('-g', '--geometry_file', help='File (jl) holding the geometry info.', type=str)
-  ap.add_argument('-s', '--segments_file', help='File (jl) holding th relations info (parents, children).', type=str)
-  ap.add_argument('-r', '--relations_file', help='File (jl) holding th relations info (parents, children).', type=str)
+  ap = ArgumentParser(description='Process line segmetation output files (jl) and generate (ttl) file containing triples.\n\tUSAGE: python %s -g GEOMETRY_FILE -s SEGMENTS_FILE -r RELATIONS_FILE -l LGD_URIS_FILE' % (basename(__file__)))
+  ap.add_argument('-g', '--geometry_file', help='File (jl) holding the geometry info (wkt).', type=str)
+  ap.add_argument('-s', '--segments_file', help='File (jl) holding segments info (metadata).', type=str)
+  ap.add_argument('-r', '--relations_file', help='File (jl) holding relations info (parents, children).', type=str)
+  ap.add_argument('-l', '--lgd_uris_file', help='File (jl) holding LinkedGeoData/OpenStreetMap info.', type=str)
   ap.add_argument('-o', '--output_file', help='The output file (ttl) with the generated triples.', default='lm_graph.ttl', type=str)
 
   args = ap.parse_args()
@@ -115,6 +121,12 @@ def main():
         for line_r in read_file:
           rel_dict = loads(line_r)
           lm_graph.add_geo_child_to_parent(rel_dict['parent_gid'], rel_dict['child_gid'])
+
+      # load linked-geo-data info
+      with open(args.lgd_uris_file) as read_file:
+        for line_r in read_file:
+          osm_dict = loads(line_r)
+          lm_graph.add_linkedgeodata_uris_to_gid(osm_dict['gid'], osm_dict['lgd_uris'])
 
       # materialize triples
       lm_graph.dt.serialize(args.output_file, format="turtle")
