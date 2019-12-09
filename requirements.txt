@@ -1,5 +1,2 @@
-setuptools
 rdflib
-psycopg2-binary
-regex
 requests
