@@ -7,7 +7,7 @@ from json import loads
 from mykgutils import fclrprint
 from rdflib import Graph, URIRef, Literal, XSD, Namespace, RDF
 
-LMG = Namespace('http://isi.linkedmap.com/')
+LMG = Namespace('http://linkedmaps.isi.edu/')
 GEO = Namespace('http://www.opengis.net/ont/geosparql#')
 PROV = Namespace('http://www.w3.org/ns/prov#')
 DCTERMS = Namespace('http://purl.org/dc/terms/')
@@ -54,7 +54,7 @@ class LinkedMapGraph:
       self.dt.add((seg_feat_uri, DCTERMS['date'], Literal(seg_yr_dt_obj.isoformat(), datatype=XSD.dateTime)))
 
     # --geo:asWKT--> "<http://www.opengis.net/def/crs/OGC/1.3/CRS84> LITERAL"^^geo:wktLiteral
-    # TODO: add CRS94 prefix
+    # TODO: add CRS84 prefix
     self.dt.add((seg_geo_uri, GEO['asWKT'], Literal(self.gid2wkt[segment_gid], datatype=GEO['wktLiteral'])))
     # TODO: add provenance information
     #   --prov:wasGeneratedBy--> prov:Activity
@@ -73,25 +73,13 @@ class LinkedMapGraph:
     # add dates of parent to its child
     for date in self.dt.objects(parent_geo_feat_uri, DCTERMS['date']):
       self.dt.add((child_geo_feat_uri, DCTERMS['date'], date))
-    
-    # when we discover a parent we must update its modified time to now
-    # and update its child with created = modified
-    #   leaf:  dcterms:created == dcterms:modified
-    #   !leaf: dcterms:created != dcterms:modified
-    d_now = datetime.today()
-    self.dt.remove((parent_geo_feat_uri, DCTERMS['modified'], None))
-    self.dt.add((parent_geo_feat_uri, DCTERMS['modified'], Literal(d_now.isoformat(), datatype=XSD.dateTime)))
-    self.dt.remove((child_geo_feat_uri, DCTERMS['modified'], None))
-    self.dt.add((child_geo_feat_uri, DCTERMS['modified'], Literal(d_now.isoformat(), datatype=XSD.dateTime)))
-    self.dt.remove((child_geo_feat_uri, DCTERMS['created'], None))
-    self.dt.add((child_geo_feat_uri, DCTERMS['created'], Literal(d_now.isoformat(), datatype=XSD.dateTime)))
 
   def add_linkedgeodata_uris_to_gid(self, geo_feat_id, list_of_lgd_uris):
     ''' Link segment to additional LinkedGeoData URIs. '''
 
     geo_feat_uri = URIRef(LMG[str(geo_feat_id)])
     for lgd_uri in list_of_lgd_uris:
-      self.dt.add((geo_feat_uri, GEO['sfContains'], URIRef(lgd_uri)))
+      self.dt.add((geo_feat_uri, GEO['sfOverlaps'], URIRef(lgd_uri)))
 
 def main():
 

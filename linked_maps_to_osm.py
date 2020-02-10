@@ -5,7 +5,7 @@ from collections import OrderedDict
 from json import loads, dumps
 from os.path import basename
 from random import randint
-from time import time
+from time import time, sleep
 from re import sub as re_sub
 from requests import get as get_request
 
@@ -32,6 +32,7 @@ def query_osm_results(query_box = {'s':0,'n':0,'w':0,'e':0}, filter_tag = ''):
         - and all relations that have such a node or such a way as members. '''
     url = url_base + query
     try:
+        sleep(2)
         req_start_time = time()
         osm_data = get_request(url).json()
         print('   Request took %.2f seconds' % (time() - req_start_time))
@@ -59,7 +60,7 @@ def create_bounding_box(coordinates = [{'lat':0,'lng':0}], index = None, buffer 
         bbox = {'s':lat-buffer,'n':lat+buffer,'w':lng-buffer,'e':lng + buffer}
     return bbox
 
-def get_openstreetmap_data(coordinates = [{'lat':0,'lng':0}], qkey='', samples=50):
+def get_openstreetmap_data(coordinates = [{'lat':0,'lng':0}], qkey='', samples=20):
     ''' Get OSM metadata in a given bounding box '''
 
     # get bbox that contains all of the coordinates
@@ -150,10 +151,12 @@ def main():
         outfile = args.geometry_file.replace('.jl', '.lgd.jl')
         with open(outfile, 'w') as write_file:
             for seg in segments:
-                print(f"generating LGD URIs for gid {seg['gid']} from {len(seg['wkt'])} coordinate-tuples")
+                print(f"generating LGD URIs for gid {seg['gid']} (has {len(seg['wkt'])} coordinate-tuples)")
                 line_dict = OrderedDict()
                 line_dict['gid'] = seg['gid']
-                line_dict['lgd_uris'] = get_linkedgeodata_uris(seg, args.filtering_key)
+                list_of_uris = get_linkedgeodata_uris(seg, args.filtering_key)
+                print(f"found {len(list_of_uris)} LGD URIs for gid {seg['gid']}")
+                line_dict['lgd_uris'] = list_of_uris
                 write_file.write(dumps(line_dict) + '\n')
         print('Exported segments info to file %s' % (outfile))
     else:
