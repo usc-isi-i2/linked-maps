@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from os.path import basename
 from datetime import datetime
 from json import loads
-from mykgutils import fclrprint
+from baselutils import fclrprint
 from rdflib import Graph, URIRef, Literal, XSD, Namespace, RDF
 
 LMG = Namespace('http://linkedmaps.isi.edu/')

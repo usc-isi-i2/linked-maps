@@ -3,7 +3,7 @@
 from argparse import ArgumentParser
 from os import listdir
 from os.path import basename
-from mykgutils import fclrprint, hash_string_md5
+from baselutils import fclrprint, hash_string_md5
 from time import time
 from datetime import timedelta
 from segment import PostGISChannel, Segment

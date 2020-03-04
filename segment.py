@@ -7,7 +7,7 @@ Each segment contains its name, PostGISChannel object, and a "pointer" pointed t
 Also, since it is a node in graph, it will contain its parents and children.
 """
 
-from mykgutils import fclrprint
+from baselutils import fclrprint
 from json import load
 from psycopg2 import connect, Error as psycopg2_error
 from psycopg2.extensions import AsIs
