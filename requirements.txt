@@ -4,3 +4,4 @@ regex
 psycopg2-binary
 setuptools
 git+https://github.com/basels/mykgutils/
+openpyxl

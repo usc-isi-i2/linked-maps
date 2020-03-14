@@ -19,14 +19,14 @@ SPARQL_HEADER = """
 """
 
 
-def get_gid_wkt(gid):
+def get_local_gid_df(gid):
   sparql = SPARQLWrapper(LCL_ENDPOINT)
 
   query_str = SPARQL_HEADER + '''
     SELECT ?f ?wkt
     WHERE {
       ?f a geo:Feature ;
-         geo:hasGeometry [ geo:asWKT ?wkt ] ;
+         geo:hasGeometry [ geo:asWKT ?wkt ] .
       FILTER (?f = <http://linkedmaps.isi.edu/%d>)
     }
   ''' % (gid)
@@ -36,30 +36,41 @@ def get_gid_wkt(gid):
   sparql.setReturnFormat(JSON)
   results = sparql.query().convert()
 
-  ret_wkt = list()
-  if "results" in results and \
-     "bindings" in results["results"] and \
-     len(results["results"]["bindings"]) != 0:
-    for result in results["results"]["bindings"]:
-        if "wkt" in result:
-            ret_wkt.append(result["wkt"]["value"])
-  
-  return ret_wkt
+  df = DataFrame(columns=['GID', 'Instance', 'Coordinates', 'Label', 'Types'])
+
+  if 'results' in results and \
+     'bindings' in results['results'] and \
+     len(results['results']['bindings']) != 0:
+    for result in results['results']['bindings']:
+      if 'f' in result and \
+         'wkt' in result:
+        df = df.append({'GID': result['f']['value'], \
+                        'Instance': None, \
+                        'Coordinates':  result['wkt']['value'], \
+                        'Label': None, \
+                        'Types': None}, \
+                        ignore_index=True)
+
+  return df
 
 
 def get_osm_df(gid):
   sparql = SPARQLWrapper(LCL_ENDPOINT)
 
   query_str = SPARQL_HEADER + '''
-    SELECT ?f ?lgd_inst ?wkt
+
+    SELECT ?f ?lgd_inst ?wkt ?label (group_concat(?lgd_type) as ?lgd_types)
     WHERE {
       ?f a geo:Feature ;
          geo:sfOverlaps ?lgd_inst .
       FILTER (?f = <http://linkedmaps.isi.edu/%d>)
       SERVICE <http://linkedgeodata.org/sparql> {
-        ?lgd_inst geovm:geometry [ ogc:asWKT ?wkt ] .
+        ?lgd_inst geovm:geometry [ ogc:asWKT ?wkt ] ;
+                  a ?lgd_type ;
+                  rdfs:label ?label .
       }
     }
+    GROUP BY ?f ?lgd_inst ?wkt ?label
   ''' % (gid)
 
   # set format and trigger query
@@ -67,14 +78,22 @@ def get_osm_df(gid):
   sparql.setReturnFormat(JSON)
   results = sparql.query().convert()
 
-  df = DataFrame(columns=['Instance', 'Coordinates'])
+  df = DataFrame(columns=['GID', 'Instance', 'Coordinates', 'Label', 'Types'])
 
-  if "results" in results and \
-      "bindings" in results["results"] and \
-      len(results["results"]["bindings"]) != 0:
-    for result in results["results"]["bindings"]:
-      if "lgd_inst" in result and 'wkt' in result:
-        df = df.append({'Instance': result["lgd_inst"]["value"], \
-                        'Coordinates':  result["wkt"]["value"]}, ignore_index=True)
+  if 'results' in results and \
+     'bindings' in results['results'] and \
+     len(results['results']['bindings']) != 0:
+    for result in results['results']['bindings']:
+      if 'f' in result and \
+         'lgd_inst' in result and \
+         'wkt' in result and \
+         'label' in result and \
+         'lgd_types' in result:
+        df = df.append({'GID': result['f']['value'], \
+                        'Instance': result['lgd_inst']['value'], \
+                        'Coordinates':  result['wkt']['value'], \
+                        'Label': result['label']['value'], \
+                        'Types': result['lgd_types']['value']}, \
+                        ignore_index=True)
 
   return df
