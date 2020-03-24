@@ -76,7 +76,7 @@ Make sure that:
 2. You're using full paths (on both local machine and docker container)
 3. The user running the docker command has access privlege (can be done by `sudo chmod 777 /volume/on/your/host/machine`)
 
-    -->
+-->
 
 ## Query and visualize you data
 Our front-end allows querying and visualizing your linked-maps-style geo-triples data.
@@ -93,6 +93,10 @@ _For example_:
 
 Now run the flask server:
 ```
-python ui/main.py
+python ui/main.py -s <sparql_endpoint_path>
+```
+For example:
+```
+python ui/main.py -s 'http://localhost:3030/linkedmaps/query'
 ```
 And navigate to `http://localhost:5000/`
