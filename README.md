@@ -82,10 +82,14 @@ Make sure that:
 Our front-end allows querying and visualizing your linked-maps-style geo-triples data.
 We use the `flask` module to create the UI and utilize Google-Maps' API to visualize the geo-data over earth's map. We assume that you are already running a SPARQL endpoint.
 
-* If you do not have a running SPARQL endpoint, we suggest using `apache-jena-fuseki`, it is a relatively lightweight triplestore, easy to use, and provides a programmatic environment. Once ready, you can run the following command to initiate the triplestore (and the SPARQL endpoint) from `fuseki`'s root directory:
-```./fuseki-server --file <your_ttl_file> </ServiceName>```
-For example:
-```./fuseki-server --file /linked-maps/bray_data/bray.linked_maps.ttl /linkedmaps```
+_If you do not have a running SPARQL endpoint, we suggest using `apache-jena-fuseki`, it is a relatively lightweight triplestore, easy to use, and provides a programmatic environment. Once ready, you can run the following command to initiate the triplestore (and the SPARQL endpoint) from `fuseki`'s root directory_:
+```
+./fuseki-server --file <your_ttl_file> </ServiceName>
+```
+_For example_:
+```
+./fuseki-server --file /linked-maps/bray_data/bray.linked_maps.ttl /linkedmaps
+```
 
 Now run the flask server:
 ```
