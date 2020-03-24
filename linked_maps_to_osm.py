@@ -32,7 +32,7 @@ def query_osm_results(query_box = {'s':0,'n':0,'w':0,'e':0}, filter_tag = ''):
         - and all relations that have such a node or such a way as members. '''
     url = url_base + query
     try:
-        sleep(2)
+        sleep(0.5)
         req_start_time = time()
         osm_data = get_request(url).json()
         print('   Request took %.2f seconds' % (time() - req_start_time))
@@ -60,7 +60,7 @@ def create_bounding_box(coordinates = [{'lat':0,'lng':0}], index = None, buffer 
         bbox = {'s':lat-buffer,'n':lat+buffer,'w':lng-buffer,'e':lng + buffer}
     return bbox
 
-def get_openstreetmap_data(coordinates = [{'lat':0,'lng':0}], qkey='', samples=20):
+def get_openstreetmap_data(coordinates = [{'lat':0,'lng':0}], qkey='', samples=30):
     ''' Get OSM metadata in a given bounding box '''
 
     # get bbox that contains all of the coordinates
@@ -132,7 +132,9 @@ def get_linkedgeodata_uris(segment, filter_key=''):
     lgd_uris = list()
     osm_lgd_data = get_openstreetmap_data(segment['wkt'], qkey=filter_key)
     for itm in osm_lgd_data:
-        lgd_uris.append(itm['lgd_uri'])
+        print(f'lgd_uri={itm["lgd_uri"]}, counts={itm["count"]}')
+        if itm["count"] > 1: # remove this statement for baseline results
+            lgd_uris.append(itm['lgd_uri'])
     
     return lgd_uris
 
@@ -142,7 +144,7 @@ def main():
 
     ap = ArgumentParser(description='Process (jl) geometry file to acquire additional info from geo-coding services.\n\tUSAGE: python %s -g GEOMETRY_FILE -f FILTERING_KEY' % (basename(__file__)))
     ap.add_argument('-g', '--geometry_file', help='File (jl) holding the geometry info.', type=str)
-    ap.add_argument('-f', '--filtering_key', help='String to filter OSM metadata by', default='', type=str)
+    ap.add_argument('-f', '--filtering_key', help='String to filter OSM metadata by', default='railway', type=str)
     args = ap.parse_args()
 
     if args.geometry_file:

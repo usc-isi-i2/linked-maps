@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+      
+      <h1 class="myfancyfont">Generate and Visualize SPARQL Queries</h1>
+      <div class="jumbotron">
+        <p>You can get started by using any of our predefined queries below!</p>
+        <form name="top_res" action="/" method="GET">
+          <span>Choose a query:</span>
+          <select name="chosen_query" onchange="this.form.submit()">
+            {% for drop_itm in classdropdown %}
+                {% if selectedclass == drop_itm %}
+            <option value="{{drop_itm}}" SELECTED>{{drop_itm}}</option>
+                {% else %}
+            <option value="{{drop_itm}}">{{drop_itm}}</option>
+                {% endif %}
+            {% endfor %}
+          </select>
+        </form>
+        <br />
+        <form name="query" action="/" method="POST">
+          <label for="sparql" class="sr-only">Sparql Query</label>
+          <textarea class="form-control" type="name" name="sparql" rows="10">{{ raw_sparql }}</textarea>
+          <br />
+          <button type="submit" id="btnSearch" class="btn btn-lg btn-primary btn-block" type="button">Query</button>
+        </form>
+        <br />
+        <div id="google-map-canvas" class="col-md-12 well" style="height:500px"></div>
+        <script type="text/javascript">
+          var myData = {{ data|safe }} ;
+          window.onload = function() {
+            wkt_map.init();
+            wkt_map.wktPlot(myData);
+          };
+        </script>
+        <br />
+        <table class="table" border=1>
+          <thead>
+            <tr>
+                {% for k in key%}
+                    <th scope="col" class="text-center danger"> {{ k }} </th>
+                {% endfor %}
+            </tr>
+          </thead>
+            <tbody>
+            {% for k in result%}
+            <tr>
+               {% for value in k%}
+                  <td>{{ value }}</td>
+               {% endfor %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+      </div>
+      
+{% endblock %}

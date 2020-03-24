@@ -9,7 +9,6 @@ The process is separated into three steps:
 2. Modeling the data into RDF.
 3. Running queries using `SPARQL` on Apache Jena. Follow the README in directory `query_and_viz/` (See README in directory `app/` for a mock-up of our front-end).
 
-
 ## Automatic Line Segmentation
 
 To run this line segmentation program, we need to setup the environment.
@@ -56,7 +55,7 @@ Select "upload data" on the dataset you created, and
 upload the `lnkd_mp_grph.ttl` found in the current working directory
 Now you can run SPARQL queries under "dataset" section
 
-    -->
+
 
 ## Docker
 
@@ -77,3 +76,27 @@ Make sure that:
 2. You're using full paths (on both local machine and docker container)
 3. The user running the docker command has access privlege (can be done by `sudo chmod 777 /volume/on/your/host/machine`)
 
+-->
+
+## Query and visualize you data
+Our front-end allows querying and visualizing your linked-maps-style geo-triples data.
+We use the `flask` module to create the UI and utilize Google-Maps' API to visualize the geo-data over earth's map. We assume that you are already running a SPARQL endpoint.
+
+_If you do not have a running SPARQL endpoint, we suggest using `apache-jena-fuseki`, it is a relatively lightweight triplestore, easy to use, and provides a programmatic environment. Once ready, you can run the following command to initiate the triplestore (and the SPARQL endpoint) from `fuseki`'s root directory_:
+```
+./fuseki-server --file <your_ttl_file> </ServiceName>
+```
+_For example_:
+```
+./fuseki-server --file /linked-maps/bray_data/bray.linked_maps.ttl /linkedmaps
+```
+
+Now run the flask server:
+```
+python ui/main.py -s <sparql_endpoint_path>
+```
+For example:
+```
+python ui/main.py -s 'http://localhost:3030/linkedmaps/query'
+```
+And navigate to `http://localhost:5000/`
