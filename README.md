@@ -29,6 +29,11 @@ python main.py -d /path/to/shapefiles/ -c /path/to/config/file -r -o /path/to/ou
 ```
 For example:  `python main.py -d maps -c config.json -r -o /tmp/line_seg.jl`
 
+<!--
+
+TODO: Add instructions to run GeoLinking (Reverse Geocoding)
+
+-->
 
 ## Modeling the data into RDF
 
@@ -55,8 +60,6 @@ Select "upload data" on the dataset you created, and
 upload the `lnkd_mp_grph.ttl` found in the current working directory
 Now you can run SPARQL queries under "dataset" section
 
-
-
 ## Docker
 
 Prior to building the image (and running the container), map shapefiles (`*.shp, *.shx`) should be inserted in `maps` directory.
@@ -78,11 +81,11 @@ Make sure that:
 
 -->
 
-## Query and visualize you data
+## Query and visualize your data
 Our front-end allows querying and visualizing your linked-maps-style geo-triples data.
 We use the `flask` module to create the UI and utilize Google-Maps' API to visualize the geo-data over earth's map. We assume that you are already running a SPARQL endpoint.
 
-_If you do not have a running SPARQL endpoint, we suggest using `apache-jena-fuseki`, it is a relatively lightweight triplestore, easy to use, and provides a programmatic environment. Once ready, you can run the following command to initiate the triplestore (and the SPARQL endpoint) from `fuseki`'s root directory_:
+_If you do not have a running SPARQL endpoint, we suggest using `apache-jena-fuseki`, it is a relatively lightweight triplestore, easy to use, and provides a programmatic environment. Once you acquired `fuseki`, you can run the following command to initiate the triplestore (and the SPARQL endpoint) from `fuseki`'s root directory_:
 ```
 ./fuseki-server --file <your_ttl_file> </ServiceName>
 ```
@@ -91,7 +94,7 @@ _For example_:
 ./fuseki-server --file /linked-maps/bray_data/bray.linked_maps.ttl /linkedmaps
 ```
 
-Now run the flask server:
+Now __run the flask server__:
 ```
 python ui/main.py -s <sparql_endpoint_path>
 ```
