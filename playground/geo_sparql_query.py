@@ -1,7 +1,7 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
 from pandas import DataFrame
 
-LCL_ENDPOINT = "http://localhost:3030/spatial_data/sparql"
+LCL_ENDPOINT = "http://localhost:3030/linkedmaps/query"
 LGD_ENDPOINT = "http://linkedgeodata.org/sparql"
 
 SPARQL_HEADER = """
