@@ -117,7 +117,7 @@ docker pull shbita/uscisi_linkedmaps
 ### Running the container
 Prior to running the Docker container, the map `shapefiles` (`*.shp, *.shx`) should be inserted in a local directory (host) that should be virtually mapped to `/linked-maps/maps` on the container. The output files and the generated `ttl` file will be dumped to the same directory. As in:
 ```
-docker run -v <hostmachine_volume:container_volume> shbita/uscisi_linkedmaps:latest
+docker run -v <hostmachine_volume>:/linked-maps/maps shbita/uscisi_linkedmaps:latest
 ```
 For example:
 ```
