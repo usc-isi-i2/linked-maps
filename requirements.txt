@@ -6,3 +6,4 @@ setuptools
 git+https://github.com/basels/mykgutils/
 openpyxl
 flask
+psycopg2
