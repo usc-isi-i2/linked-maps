@@ -7,9 +7,9 @@ WORKDIR /linked-maps
 # install python3.5 and wget
 RUN apt-get update && \
     apt-get install -y software-properties-common wget && \
-    add-apt-repository -y ppa:jonathonf/python-3.5
+    add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update -y
-RUN apt-get install -y build-essential python3.5 python3.5-dev python3-pip python3.5-venv
+RUN apt-get install -y build-essential python3.5 python3-pip git
 
 # install GDAL/OGR
 RUN add-apt-repository -y ppa:ubuntugis/ppa && \
@@ -17,13 +17,10 @@ RUN add-apt-repository -y ppa:ubuntugis/ppa && \
     apt-get install -y gdal-bin libgdal-dev python-gdal python3-gdal
 
 # install postgresql and postgis
-RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt xenial-pgdg main" >> /etc/apt/sources.list' && \
-    wget --quiet -O - http://apt.postgresql.org/pub/repos/apt/ACCC4CF8.asc | apt-key add - && \
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main" > /etc/apt/sources.list.d/PostgreSQL.list' && \
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
     apt-get update && \
-    apt-get install -y postgresql-11 && \
-    apt-get install -y postgresql-11-postgis-2.5 && \ 
-    apt-get install -y postgresql-11-postgis-scripts && \
-    apt-get install -y postgis
+    apt-get install -y postgresql-11 postgresql-11-postgis-2.5 postgresql-11-postgis-2.5-scripts postgis
 
 # update pip
 RUN python3.5 -m pip install pip --upgrade
@@ -35,18 +32,18 @@ WORKDIR /linked-maps
 # install additional requirements
 RUN pip3.5 install -r requirements.txt
 
-# create 'results' dir and grant access to it for all users
-RUN mkdir results && chmod 777 results
+# create 'maps' dir and grant access to it for all users
+RUN mkdir maps && chmod 777 maps
 
 # switch to user 'postgres'
 USER postgres
 
 # initiate postgresql service and create database with postgis extension
-# then run line-segmentation and generate triples
+# then run the pipeline
 CMD /etc/init.d/postgresql start && \
     createdb linkedmaps && \
-    psql linkedmaps -c "CREATE EXTENSION Postgis;" && \
-    python3.5 main.py -d maps -c config.json -r -o results/line_seg.jl 2>&1 | tee results/line_seg.output.txt && \
-    python3.5 linked_maps_to_osm.py -g results/line_seg.geom.jl -f railway 2>&1 | tee results/osm.output.txt && \
-    python3.5 generate_graph.py -g results/line_seg.geom.jl -s results/line_seg.seg.jl -r results/line_seg.rel.jl -l results/line_seg.geom.lgd.jl -o results/linked_maps_graph.ttl && \
-    ls -l results
+    psql linkedmaps -c "CREATE EXTENSION postgis;" && \
+    python3.5 main.py -d maps -c config.json -r -o maps/line_seg.jl 2>&1 | tee maps/line_seg.output.txt && \
+    python3.5 linked_maps_to_osm.py -g maps/line_seg.geom.jl -f railway 2>&1 | tee maps/osm.output.txt && \
+    python3.5 generate_graph.py -g maps/line_seg.geom.jl -s maps/line_seg.seg.jl -r maps/line_seg.rel.jl -l maps/line_seg.geom.lgd.jl -o maps/maps.linked_maps.ttl && \
+    ls -l maps

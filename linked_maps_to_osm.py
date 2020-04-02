@@ -65,7 +65,7 @@ def get_openstreetmap_data(coordinates = [{'lat':0,'lng':0}], qkey='', samples=3
 
     # get bbox that contains all of the coordinates
     bbox = create_bounding_box(coordinates, None)
-    # print(f'bbox for the given set of coordinates is: {bbox}')
+    # print('bbox for the given set of coordinates is: %s' % (str(bbox)))
     bound_data = query_osm_results(bbox, qkey)
     data_dict = {element['id']: element for element in bound_data}
     counts = {element['id']: 1 for element in bound_data}
@@ -96,7 +96,7 @@ def get_openstreetmap_data(coordinates = [{'lat':0,'lng':0}], qkey='', samples=3
                            'count': counts[identifier],
                            'lgd_uri': get_openstreetmap_member_uri(feature_type, feature_identifier)})
         # else:
-        #     print(f'identifier {identifier} was not found in data_dict. skipped...')
+            # print('identifier %s was not found in data_dict. skipped...' % (str(identifier)))
 
     return result
 
@@ -132,7 +132,7 @@ def get_linkedgeodata_uris(segment, filter_key=''):
     lgd_uris = list()
     osm_lgd_data = get_openstreetmap_data(segment['wkt'], qkey=filter_key)
     for itm in osm_lgd_data:
-        print(f'lgd_uri={itm["lgd_uri"]}, counts={itm["count"]}')
+        print('lgd_uri=%s, counts=%d' % (itm["lgd_uri"], itm["count"]))
         if itm["count"] > 1: # remove this statement for baseline results
             lgd_uris.append(itm['lgd_uri'])
     
@@ -149,15 +149,16 @@ def main():
 
     if args.geometry_file:
         segments = open_geom(args.geometry_file)
-        print(f'there are {len(segments)} segments (collections of features/vectors) in input file')
+        print('there are %d segments (collections of features/vectors) in input file' % (len(segments)))
         outfile = args.geometry_file.replace('.jl', '.lgd.jl')
         with open(outfile, 'w') as write_file:
             for seg in segments:
-                print(f"generating LGD URIs for gid {seg['gid']} (has {len(seg['wkt'])} coordinate-tuples)")
+                print("generating LGD URIs for gid %s (has %d coordinate-tuples)" % \
+                      (str(seg['gid']), len(seg['wkt'])))
                 line_dict = OrderedDict()
                 line_dict['gid'] = seg['gid']
                 list_of_uris = get_linkedgeodata_uris(seg, args.filtering_key)
-                print(f"found {len(list_of_uris)} LGD URIs for gid {seg['gid']}")
+                print("found %d LGD URIs for gid %s" % (len(list_of_uris), str(seg['gid'])))
                 line_dict['lgd_uris'] = list_of_uris
                 write_file.write(dumps(line_dict) + '\n')
         print('Exported segments info to file %s' % (outfile))
