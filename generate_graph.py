@@ -111,10 +111,11 @@ def main():
           lm_graph.add_geo_child_to_parent(rel_dict['parent_gid'], rel_dict['child_gid'])
 
       # load linked-geo-data info
-      with open(args.lgd_uris_file) as read_file:
-        for line_r in read_file:
-          osm_dict = loads(line_r)
-          lm_graph.add_linkedgeodata_uris_to_gid(osm_dict['gid'], osm_dict['lgd_uris'])
+      if args.lgd_uris_file:
+        with open(args.lgd_uris_file) as read_file:
+          for line_r in read_file:
+            osm_dict = loads(line_r)
+            lm_graph.add_linkedgeodata_uris_to_gid(osm_dict['gid'], osm_dict['lgd_uris'])
 
       # materialize triples
       lm_graph.dt.serialize(args.output_file, format="turtle")
