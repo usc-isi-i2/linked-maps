@@ -45,5 +45,5 @@ CMD /etc/init.d/postgresql start && \
     psql linkedmaps -c "CREATE EXTENSION postgis;" && \
     python3.5 main.py -d maps -c config.json -r -o maps/line_seg.jl 2>&1 | tee maps/line_seg.output.txt && \
     python3.5 linked_maps_to_osm.py -g maps/line_seg.geom.jl -f railway 2>&1 | tee maps/osm.output.txt && \
-    python3.5 generate_graph.py -g maps/line_seg.geom.jl -s maps/line_seg.seg.jl -r maps/line_seg.rel.jl -l maps/line_seg.geom.lgd.jl -o maps/maps.linked_maps.ttl && \
+    python3.5 generate_graph.py -g maps/line_seg.geom.jl -s maps/line_seg.seg.jl -r maps/line_seg.rel.jl -l maps/line_seg.geom.lgd.jl -o maps/linked_maps.maps.ttl && \
     ls -l maps

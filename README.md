@@ -56,7 +56,7 @@ python main.py -d <path_to_shapefiles>
 ```
 For example:
 ```
-python main.py -d maps_bray -c config.json -r -o /tmp/line_seg.jl
+python main.py -d data_bray/ -c config.json -r -o /tmp/line_seg.jl
 ```
 will produce the files: `/tmp/line_seg.geom.jl` (geometry), `/tmp/line_seg.seg.jl` (segments) and `/tmp/line_seg.rel.jl` (relations).
 
@@ -92,9 +92,9 @@ python generate_graph.py -g <path_to_geometry_file>
 ```
 For example:
 ```
-python generate_graph.py -g /tmp/line_seg.geom.jl -s /tmp/line_seg.seg.jl -r /tmp/line_seg.rel.jl -l /tmp/line_seg.geom.lgd.jl -o /tmp/maps_bray.linked_maps.ttl
+python generate_graph.py -g /tmp/line_seg.geom.jl -s /tmp/line_seg.seg.jl -r /tmp/line_seg.rel.jl -l /tmp/line_seg.geom.lgd.jl -o /tmp/linked_maps.maps.ttl
 ```
-will produce the file `/tmp/maps_bray.linked_maps.ttl`
+will produce the file `/tmp/linked_maps.maps.ttl`
 
 ------------------
 
@@ -141,7 +141,7 @@ _If you do not have a running `SPARQL` endpoint, we suggest using `apache-jena-f
 ```
 _For example_:
 ```
-./fuseki-server --file /linked-maps/bray_data/bray.linked_maps.ttl /linkedmaps
+./fuseki-server --file /linked-maps/data_bray/linked_maps.bray.ttl /linkedmaps
 ```
 
 Now run the flask server:

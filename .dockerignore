@@ -1,6 +1,6 @@
 ./maps
-./maps_bray
-./maps_louisville
+./data_bray
+./data_louisville
 ./playground
 ./ui
 ./*.ttl

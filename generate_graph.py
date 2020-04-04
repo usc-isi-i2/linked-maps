@@ -88,7 +88,7 @@ def main():
   ap.add_argument('-s', '--segments_file', help='File (jl) holding segments info (metadata).', type=str)
   ap.add_argument('-r', '--relations_file', help='File (jl) holding relations info (parents, children).', type=str)
   ap.add_argument('-l', '--lgd_uris_file', help='File (jl) holding LinkedGeoData/OpenStreetMap info.', type=str)
-  ap.add_argument('-o', '--output_file', help='The output file (ttl) with the generated triples.', default='lm_graph.ttl', type=str)
+  ap.add_argument('-o', '--output_file', help='The output file (ttl) with the generated triples.', default='linked_maps.maps.ttl', type=str)
 
   args = ap.parse_args()
 
