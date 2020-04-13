@@ -11,8 +11,8 @@ from baselutils import fclrprint
 from json import load
 from psycopg2 import connect, Error as psycopg2_error
 from psycopg2.extensions import AsIs
-from postgis_sqls import OPERATION_DIFF_W_UNION, OPERATION_INTERSECT, OPERATION_UNION, OPERATION_MINUS, \
-                        sqlstr_reset_all_tables, sqlstr_op_records, \
+from postgis_sqls import OPERATION_DIFF_W_UNION, OPERATION_INTERSECT, OPERATION_MINUS, \
+                        set_global_geom_type, sqlstr_reset_all_tables, sqlstr_op_records, \
                         sqlstr_create_gid_geom_table, sqlstr_insert_new_record_to_geom_table, \
                         sqlstr_export_geom_table_to_file
 from osgeo.ogr import Open as ogr_open
@@ -59,7 +59,7 @@ class Segment:
 
     def perform_sql_op(self, list_of_other_gids, new_name, operation, buff=0.0015):
         ''' Performs an operation on the segment class with an additional segment,
-        supported operations: OPERATION_INTERSECT, OPERATION_UNION, OPERATION_MINUS '''
+        supported operations: OPERATION_INTERSECT, OPERATION_MINUS, OPERATION_DIFF_W_UNION '''
 
         start_time = time()
         sql_op_segments = sqlstr_op_records(operation, self.pgchannel.geom_table_name, self.gid, list_of_other_gids, buff)
@@ -91,13 +91,6 @@ class Segment:
             # set parents
             new_seg.parents[self.gid] = self
             new_seg.parents[other_seg.gid] = other_seg
-        return new_seg
-
-    @verify
-    def union(self, other_seg, new_name, buff=0.0015):
-        ''' Union the segment class with an additional segment. '''
-
-        new_seg = self.perform_sql_op([other_seg.gid], new_name, OPERATION_UNION, buff)
         return new_seg
 
     @verify
@@ -190,7 +183,8 @@ class PostGISChannel:
             self.dbname             = config["dbname"]
             self.user               = config["user"]
             self.host               = config["host"]
-            self.geom_table_name    = config["geom_table_name"]
+            self.geom_table_name    = config["geometry_table_name"]
+            geo_type                = config["geometry_type"] # "MULTILINESTRING" / "MULTIPOLYGON"
             self.SRID               = config["SRID"]
         except LookupError:
             print("Invalid configuration file")
@@ -206,6 +200,9 @@ class PostGISChannel:
         except psycopg2_error as e:
             print("Unable to connect to the database: %s" % str(e))
             exit(-1)
+
+        # set geometry type
+        set_global_geom_type(geo_type)
 
         # reset tables if requested
         if reset_tables:

@@ -88,7 +88,7 @@ def main():
   ap.add_argument('-s', '--segments_file', help='File (jl) holding segments info (metadata).', type=str)
   ap.add_argument('-r', '--relations_file', help='File (jl) holding relations info (parents, children).', type=str)
   ap.add_argument('-l', '--lgd_uris_file', help='File (jl) holding LinkedGeoData/OpenStreetMap info.', type=str)
-  ap.add_argument('-o', '--output_file', help='The output file (ttl) with the generated triples.', default='lm_graph.ttl', type=str)
+  ap.add_argument('-o', '--output_file', help='The output file (ttl) with the generated triples.', default='linked_maps.maps.ttl', type=str)
 
   args = ap.parse_args()
 
@@ -111,10 +111,11 @@ def main():
           lm_graph.add_geo_child_to_parent(rel_dict['parent_gid'], rel_dict['child_gid'])
 
       # load linked-geo-data info
-      with open(args.lgd_uris_file) as read_file:
-        for line_r in read_file:
-          osm_dict = loads(line_r)
-          lm_graph.add_linkedgeodata_uris_to_gid(osm_dict['gid'], osm_dict['lgd_uris'])
+      if args.lgd_uris_file:
+        with open(args.lgd_uris_file) as read_file:
+          for line_r in read_file:
+            osm_dict = loads(line_r)
+            lm_graph.add_linkedgeodata_uris_to_gid(osm_dict['gid'], osm_dict['lgd_uris'])
 
       # materialize triples
       lm_graph.dt.serialize(args.output_file, format="turtle")

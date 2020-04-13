@@ -2,6 +2,7 @@
     "dbname": "linkedmaps",
     "user": "postgres",
     "host": "",
-    "geom_table_name": "geomerty",
+    "geometry_table_name": "geom_tbl",
+    "geometry_type": "MULTILINESTRING",
     "SRID": 4269
 }

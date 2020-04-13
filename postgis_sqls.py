@@ -4,12 +4,20 @@ from os.path import abspath
 from psycopg2.extensions import AsIs
 
 OPERATION_INTERSECT = 'ST_INTERSECTION'
-OPERATION_UNION = 'ST_UNION'
+# OPERATION_UNION = 'ST_UNION'
 OPERATION_MINUS = 'ST_DIFFERENCE'
 OPERATION_DIFF_W_UNION = 'INTERNAL_DIFF_W_UNION'
 
+def set_global_geom_type(geo_type='MULTILINESTRING'):
+    ''' Set the global type of geometry '''
+
+    global g_geo_type
+    g_geo_type = geo_type
+
 def sqlstr_reset_all_tables(geom_tablename, srid):
     ''' Get SQL string to reset tables (geom). '''
+
+    global g_geo_type
 
     sql_str = '''
         DROP TABLE IF EXISTS %s;
@@ -17,37 +25,50 @@ def sqlstr_reset_all_tables(geom_tablename, srid):
             gid SERIAL NOT NULL PRIMARY KEY,
             wkt VARCHAR
         );
-        select AddGeometryColumn('%s', 'geom', %s, 'MULTILINESTRING', 2);
-        ''' % (AsIs(geom_tablename), AsIs(geom_tablename), AsIs(geom_tablename), srid)
+        select AddGeometryColumn('%s', 'geom', %s, '%s', 2);
+        ''' % (AsIs(geom_tablename), AsIs(geom_tablename), AsIs(geom_tablename), srid, g_geo_type)
     return sql_str
 
 def sqlstr_op_records(operation, geom_tablename, segment_1_gid, list_of_gids, buffer_size):
     ''' Get SQL string to perform operation 'op' between two records . '''
+
+    global g_geo_type
 
     sub_op = operation
     if operation == OPERATION_DIFF_W_UNION:
         sub_op = OPERATION_MINUS
 
     sql_str = '''
-        INSERT INTO %s (wkt, geom)
-        SELECT ST_ASTEXT(res.lr), lr
-        FROM(
-            SELECT ST_MULTI(
-                ST_INTERSECTION(
-                    l.geom,
-                    %s(
-                        st_buffer(l.geom, %s),
-                        st_buffer(r.geom, %s)
+            INSERT INTO %s (wkt, geom)
+            SELECT ST_ASTEXT(res.lr), lr
+            FROM(
+                SELECT ST_MULTI( ''' % (AsIs(geom_tablename))
+
+    if g_geo_type == 'MULTILINESTRING':
+        sql_str += '''
+                    ST_INTERSECTION(
+                        l.geom,
+                        %s(
+                            st_buffer(l.geom, %s),
+                            st_buffer(r.geom, %s)
+                        )
                     )
-                )
-            ) as lr
-            FROM (
-                SELECT geom
-                FROM %s
-                WHERE %s.gid = %s
-            ) as l,
-        ''' % (AsIs(geom_tablename), sub_op, buffer_size, buffer_size, \
-               AsIs(geom_tablename), AsIs(geom_tablename), segment_1_gid)
+            ''' % (sub_op, buffer_size, buffer_size)
+    else:
+        sql_str += '''
+                    %s(
+                        l.geom,
+                        r.geom
+                    )
+            ''' % (sub_op)
+
+    sql_str += '''
+                ) as lr
+                FROM (
+                    SELECT geom
+                    FROM %s
+                    WHERE %s.gid = %s
+                ) as l, ''' % (AsIs(geom_tablename), AsIs(geom_tablename), segment_1_gid)
 
     gid_2_sql_substring = sqlstr_build_or_clause_of_gids(geom_tablename, list_of_gids)
 
@@ -71,22 +92,28 @@ def sqlstr_op_records(operation, geom_tablename, segment_1_gid, list_of_gids, bu
             ) as r
         ''' % (AsIs(geom_tablename), gid_2_sql_substring)
 
+    st_geo_type = 'ST_MultiLineString'
+    if g_geo_type != 'MULTILINESTRING':
+        st_geo_type = 'ST_MultiPolygon'
+
     sql_str += '''
         ) res
-        where ST_geometrytype(res.lr) = 'ST_MultiLineString'
+        where ST_geometrytype(res.lr) = '%s'
         RETURNING gid
-        '''
+    ''' % (st_geo_type)
 
     return sql_str
 
 def sqlstr_create_gid_geom_table(active_tablename, srid):
     ''' Create a table with gid, geom data. '''
 
+    global g_geo_type
+
     sql_str = '''
         DROP TABLE IF EXISTS %s; 
         CREATE TABLE %s (gid SERIAL NOT NULL PRIMARY KEY);
-        SELECT AddGeometryColumn('%s', 'geom', %s, 'MULTILINESTRING', 2);
-        ''' % (AsIs(active_tablename), AsIs(active_tablename), AsIs(active_tablename), srid)
+        SELECT AddGeometryColumn('%s', 'geom', %s, '%s', 2);
+        ''' % (AsIs(active_tablename), AsIs(active_tablename), AsIs(active_tablename), srid, g_geo_type)
     return sql_str
 
 def sqlstr_insert_new_record_to_geom_table(geom_tablename, active_tablename):

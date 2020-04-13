@@ -57,7 +57,7 @@ def create_bounding_box(coordinates = [{'lat':0,'lng':0}], index = None, buffer 
     else:
         lat = coordinates[index]['lat']
         lng = coordinates[index]['lng']
-        bbox = {'s':lat-buffer,'n':lat+buffer,'w':lng-buffer,'e':lng + buffer}
+        bbox = {'s':lat-buffer,'n':lat+buffer,'w':lng-buffer,'e':lng+buffer}
     return bbox
 
 def get_openstreetmap_data(coordinates = [{'lat':0,'lng':0}], qkey='', samples=30):
