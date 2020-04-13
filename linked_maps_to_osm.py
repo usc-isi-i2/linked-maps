@@ -16,7 +16,7 @@ def get_openstreetmap_member_uri(osm_type, osm_id):
 
     return "http://linkedgeodata.org/triplify/" + str(osm_type) + str(osm_id)
 
-def query_osm_results(query_box = {'s':0,'n':0,'w':0,'e':0}, filter_tag = ''):
+def query_osm_results(query_box = {'s':0,'n':0,'w':0,'e':0}, filter_tag_or_tagval = ''):
     ''' Query OSM 'relation' data elements in a given bounding box.
     'relation' elements are used to organize multiple nodes or ways into a larger whole.
     
@@ -36,13 +36,20 @@ def query_osm_results(query_box = {'s':0,'n':0,'w':0,'e':0}, filter_tag = ''):
         req_start_time = time()
         osm_data = get_request(url).json()
         print('   Request took %.2f seconds' % (time() - req_start_time))
-        if filter_tag != '':
+        if filter_tag_or_tagval != '':
             filtered_set = list()
             for itm in osm_data['elements']:
-                if 'tags' in itm and filter_tag in itm['tags']:
-                    filtered_set.append(itm)
+                if 'tags' in itm:
+                    # print("itm['tags'] = " + str(itm['tags']))
+                    if filter_tag_or_tagval in itm['tags']:
+                        filtered_set.append(itm)
+                    else:
+                        for itag in itm['tags']:
+                            # print('itag: ' + str(itag) + " = " + str(itm['tags'][itag]))
+                            if itm['tags'][itag] == filter_tag_or_tagval:
+                                filtered_set.append(itm)
             return filtered_set
-        return osm_data['elements']        
+        return osm_data['elements']
     except ValueError as _:
         print('ValueError for query_box' + str(query_box))
         return []
