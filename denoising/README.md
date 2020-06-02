@@ -1,7 +1,7 @@
 # Denoising
 - Denoising is the task of removing false positives from map vector data using clustering analysis.
 - Because of the usage of clustering techniques in determining the noise, this method is unsupervised.
-- It is (as of yet) intended to work for linear continuous features such as railroads, roads, waterlines.
+- It is (as of yet) intended to work only for linear continuous features such as railroads, roads, waterlines.
 
 <hr>
 
@@ -10,7 +10,7 @@
 - Output: denoised shapefile
 - Command: *python3 denoiser.py /path/to/shapefile/\*.shp*
 - Default: python3 denoiser.py --clustering agglomerative --basis health --plot True --decimals 6 SHAPEFILE (see Notes)
-# 
+#
     python3 denoiser.py [-h] [--clustering [C]] [--basis [B]] [--explain [%]]
                         [--plot [P]] [--decimals [D]]
                         SHAPEFILE [SHAPEFILE ...]
@@ -27,7 +27,7 @@
     --decimals [D]    Round D(6) places                   
 
 ### Denoising Example
-![Example](https://github.com/usc-isi-i2/linked-maps/blob/denoising/denoising/examples/example.png)
+![Example](https://github.com/usc-isi-i2/linked-maps/blob/denoising/denoising/examples/example1.png)
 - **Black**: Noise (False Positive) identified
 - Note: The axes range wasn't controlled for plotting and hence the discerning distortions in the denoised plots.
 
@@ -51,7 +51,7 @@
   - Depending on the basis B:
     - health: clusters are sorted based on a health score (see below) calculated for their neighborhood
     - density: clusters are sorted based on the number of points they contain
-  - Using a ![Knee Detection Algorithm](https://github.com/arvkevi/kneed) , a knee is determined and the noisy clusters are discarded.
+  - Using a [Knee Detection Algorithm](https://github.com/arvkevi/kneed), a knee is determined and the noisy clusters are discarded.
   - The discarding is done based on estimating noise in an unsupervised manner, either:
     - pass as an argument P% to be explained/retained i.e. atmost (100-P)% noise will be removed
     - or estimation algorithm estimates noise based on the scatter plot of data (below)
@@ -72,7 +72,6 @@
     - explain (100-%noise) in the data clusters to get denoised data
 
 
-
 <hr>
 
 # Where does it fit in the pipeline:
@@ -83,8 +82,8 @@
 
 <hr>
 
-![Health Formula](https://github.com/usc-isi-i2/linked-maps/blob/denoising/denoising/examples/health2.png)
-![Health](https://github.com/usc-isi-i2/linked-maps/blob/denoising/denoising/examples/health1.png)
+# Health of a cluster
+![Health Formula](https://github.com/usc-isi-i2/linked-maps/blob/denoising/denoising/examples/health-formula.png)
 
 ### Notes
 - Agglomerative is faster than DBSCAN (in this algorithm)
