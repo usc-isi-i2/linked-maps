@@ -160,11 +160,11 @@ then navigate to `http://localhost:5000/`
 
 If you would like to cite this work in a paper or a presentation, the following is recommended (`BibTeX` entry):
 ```
-@inproceedings{shbita2020:building,
+@inproceedings{shbita2020building,
   title={Building Linked Spatio-Temporal Data from Vectorized Historical Maps},
-  author={Basel Shbita and Craig A. Knoblock and Weiwei Duan and Yao-Yi Chiang and Johannes H. Uhl and Stefan Leyk},
-  booktitle={Extended Semantic Web Conference},
-  pages={},
+  author={Shbita, Basel and Knoblock, Craig A and Duan, Weiwei and Chiang, Yao-Yi and Uhl, Johannes H and Leyk, Stefan},
+  booktitle={European Semantic Web Conference},
+  pages={409--426},
   year={2020},
   organization={Springer}
 }
