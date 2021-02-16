@@ -11,6 +11,8 @@ from requests import get as get_request
 from shapely import wkt
 from shapely.geometry import Point
 
+MAX_POLYGON_SAMPLE_RETRIES = 20
+
 
 # --- OSM API -----------------------------------------------------------------
 
@@ -76,10 +78,14 @@ def create_bounding_box__multiline(coordinates, random=False, buffer=0.001):
 def get_random_point_in_polygon(poly):
     ''' Get random point in Polygon '''
     minx, miny, maxx, maxy = poly.bounds
+    esc_counter = 0
     while True:
         p = Point(uniform(minx, maxx), uniform(miny, maxy))
+        esc_counter += 1
         if poly.contains(p):
             return p
+        if esc_counter > MAX_POLYGON_SAMPLE_RETRIES:
+            return poly.representative_point()
 
 
 def create_bounding_box__multipolygon(coordinates, random=False, buffer=0.001):
@@ -185,7 +191,6 @@ def get_osm_uris(segment, filter_key=''):
         print('osm_uri=%s, counts=%d' % (itm["osm_uri"], itm["count"]))
         if itm["count"] > 1:  # remove this statement for baseline results
             osm_uris.append(itm['osm_uri'])
-        #osm_uris.append(itm['osm_uri'])
     
     return osm_uris
 
