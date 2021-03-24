@@ -1,25 +1,25 @@
 # Linked Maps
 
-A framework for unsupervised conversion of vector data - extracted from USGS historical topographic map archives - into linked and publishable spatio-temporal data as `RDF`. The resulting graphs can be easily queried and visualized to understand the changes in specific regions over time.
+A framework for unsupervised conversion of vector data - extracted from USGS historical topographic map archives - into linked and publishable spatio-temporal data as `RDF`. The resulting knowledge graphs can be easily queried and visualized to understand the changes of features in specific regions over time.
 
 The process runs in three steps which can be executed separately (see the following sections):
-1. __Automatic Feature Segmentation__
-2. __Geo-linking__
-3. __Modeling the data into `RDF`__
+1. __Automatic geometric feature partitioning__
+2. __Geo entity-linking__
+3. __Modeling the data into `RDF` (constructing the knowledge graph)__
 
 Additionally, we provide a `dockerfile` and instructions on how to run the full pipeline automatically using [Docker](https://www.docker.com/), and provide a front-end `flask` application to allow running queries - over a defined `SPARQL` endpoint - and visualizing their results.
 
-This is the implementation accompanying the paper _Building Linked Spatio-Temporal Data from Vectorized Historical Maps_ to be published on the 17th Extended Semantic Web Conference (ESWC 2020).
+This is the implementation accompanying the paper _Building Linked Spatio-Temporal Data from Vectorized Historical Maps_ published in the 17th Extended Semantic Web Conference (ESWC 2020).
 
 ------------------
 
 ### Preparing to run the program
 
-The environment framework I used was [`anaconda`](https://www.anaconda.com/distribution/), then I did the following:
+The environment framework we use is [`anaconda`](https://www.anaconda.com/distribution/), then you should do the following:
 
-1. Create a new environment from scratch with the `python3.6`:
+1. Create a new environment from scratch with the `python3.7`:
    ```
-   conda create -n linkedmaps python=3.6
+   conda create -n linkedmaps python=3.7
    ```
 2. Activate the environment:
    ```
@@ -39,13 +39,13 @@ The environment framework I used was [`anaconda`](https://www.anaconda.com/distr
 
 ------------------
 
-## Automatic Feature Segmentation
+## Automatic geometric feature partitioning
 
-The first task in our pipeline is the creation of segment partitions (elements) that can represent the various geographic features (e.g., railway) across different map editions of the same region. We use `PostgreSQL` (with `PostGIS` extension and integration using `python`) to accomplish this task. The following script takes a directory holding a collection of `shapefile`s and a simple configuration file as input, and produces a collection of `jl` (JSON Lines) files capturing the data and metadata of the partitioned segments.
+The first task in our pipeline is the creation of geometric building-blocks that can represent the various geographic features (e.g., railway, wetland) across different map editions of the same region. We use `PostgreSQL` (with `PostGIS` extension and integration using `python`) to accomplish this task. The following script takes a directory holding a collection of vector data as `shapefile`s and a simple configuration file as input, and produces a collection of `jl` (JSON Lines) files capturing the data and metadata of the partitioned segments.
 
 First, make sure that:
-* Your configuration file (`config.json`) is correct (set the database access attributes accordingly).
-* The name of each `shapefile` in your "maps" directory matches the temporal extent of the map edition it represents
+* Your configuration file (`config.json`) is correct (set the database access attributes accordingly, and the geometry type: `MULTILINESTRING` or `MULTIPOLYGON`).
+* The name of each `shapefile` in your "maps" directory matches the temporal extent of the map edition it represents (the year it was published).
 
 How to run:
 ```
@@ -56,14 +56,14 @@ python main.py -d <path_to_shapefiles>
 ```
 For example:
 ```
-python main.py -d data_bray/ -c config.json -r -o /tmp/line_seg.jl
+python main.py -d data/railroads/ca/ -c config.json -r -o /tmp/line_seg.jl
 ```
 will produce the files: `/tmp/line_seg.geom.jl` (geometry), `/tmp/line_seg.seg.jl` (segments) and `/tmp/line_seg.rel.jl` (relations).
 
 
-## Geo-linking
+## Geo entity-linking
 
-In this task we link the extracted segments from the processed historical maps to additional knowledge bases on the web (a task of geo-entity matching). We utilize a reverse-geocoding service (`OpenStreetMap`) to map the resulting segments to instances on the semantic web (`LinkedGeoData`). The following script takes a "geometry" `jl` file as input, and produces an additional `jl` file holding the `URI`s of the distant instances we captured.
+In this task we link the extracted building-blocks from the processed historical maps to additional knowledge bases on the web (a task of geo entity-linking/matching). We utilize a reverse-geocoding service  to map the resulting segments to instances on `OpenStreetMap`. The following script takes a "geometry" `jl` file as input, and produces an additional `jl` file holding the `URI`s of the distant instances we captured.
 
 How to run:
 ```
@@ -74,7 +74,7 @@ For example:
 ```
 python linked_maps_to_osm.py -g /tmp/line_seg.geom.jl -f railway
 ```
-will produce the file `/tmp/line_seg.geom.lgd.jl`
+will produce the file `/tmp/line_seg.geom.osm.jl`
 
 
 ## Modeling the data into `RDF`
@@ -87,12 +87,12 @@ How to run:
 python generate_graph.py -g <path_to_geometry_file>
                          -s <path_to_segments_file>
                          -r <path_to_relations_file>
-                         -l <path_to_linkedgeodata_uris_file>
+                         -l <path_to_osm_uris_file>
                          -o <path_to_output_file>
 ```
 For example:
 ```
-python generate_graph.py -g /tmp/line_seg.geom.jl -s /tmp/line_seg.seg.jl -r /tmp/line_seg.rel.jl -l /tmp/line_seg.geom.lgd.jl -o /tmp/linked_maps.maps.ttl
+python generate_graph.py -g /tmp/line_seg.geom.jl -s /tmp/line_seg.seg.jl -r /tmp/line_seg.rel.jl -l /tmp/line_seg.geom.osm.jl -o /tmp/linked_maps.maps.ttl
 ```
 will produce the file `/tmp/linked_maps.maps.ttl`
 
@@ -141,7 +141,7 @@ _If you do not have a running `SPARQL` endpoint, we suggest using `apache-jena-f
 ```
 _For example_:
 ```
-./fuseki-server --file /linked-maps/data_bray/linked_maps.bray.ttl /linkedmaps
+./fuseki-server --file /linked-maps/data/railroads/ca/linked_maps.railroads.ca.ttl /linkedmaps
 ```
 
 Now run the flask server:

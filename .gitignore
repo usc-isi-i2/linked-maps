@@ -3,3 +3,5 @@ env
 __pycache__
 *.pyc
 *.csv
+.idea
+.ipynb_checkpoints

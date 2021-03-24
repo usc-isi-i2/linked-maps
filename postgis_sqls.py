@@ -57,8 +57,8 @@ def sqlstr_op_records(operation, geom_tablename, segment_1_gid, list_of_gids, bu
     else:
         sql_str += '''
                     %s(
-                        l.geom,
-                        r.geom
+                        st_buffer(l.geom, 0),
+                        st_buffer(r.geom, 0)
                     )
             ''' % (sub_op)
 

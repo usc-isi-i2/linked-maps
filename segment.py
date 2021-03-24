@@ -64,8 +64,8 @@ class Segment:
         start_time = time()
         sql_op_segments = sqlstr_op_records(operation, self.pgchannel.geom_table_name, self.gid, list_of_other_gids, buff)
         cur = self.pgchannel.connection.cursor()
+        self.pgchannel.pgcprint(sql_op_segments)
         cur.execute(sql_op_segments)
-        self.pgchannel.pgcprint(cur.query.decode())
         fetchall = cur.fetchall()
         if len(fetchall) > 1:
             raise ValueError("Fetched too many entries (should be 0 or 1): fetchall: %s " % (fetchall))
