@@ -163,8 +163,8 @@ If you would like to cite this work in a paper or a presentation, the following 
 @inproceedings{shbita2020building,
   title={Building Linked Spatio-Temporal Data from Vectorized Historical Maps},
   author={Shbita, Basel and Knoblock, Craig A and Duan, Weiwei and Chiang, Yao-Yi and Uhl, Johannes H and Leyk, Stefan},
-  booktitle={Extended Semantic Web Conference},
-  pages={},
+  booktitle={European Semantic Web Conference},
+  pages={409--426},
   year={2020},
   organization={Springer}
 }
