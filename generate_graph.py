@@ -7,7 +7,7 @@ from json import loads
 from baselutils import fclrprint
 from rdflib import Graph, URIRef, Literal, XSD, Namespace, RDF
 
-LMG = Namespace('http://linkedmaps.isi.edu/')
+LMG = Namespace('https://linked-maps.isi.edu/resource/')
 GEO = Namespace('http://www.opengis.net/ont/geosparql#')
 PROV = Namespace('http://www.w3.org/ns/prov#')
 DCTERMS = Namespace('http://purl.org/dc/terms/')
