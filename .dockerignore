@@ -1,7 +1,7 @@
 ./maps
-./data_bray
-./data_louisville
-./playground
+./data
 ./ui
 ./*.ttl
 ./*.md
+./geo_playground
+./webapp
