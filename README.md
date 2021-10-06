@@ -1,6 +1,6 @@
 # Linked Maps
 
-A framework for unsupervised conversion of vector data - extracted from USGS historical topographic map archives - into linked and publishable spatio-temporal data as `RDF`. The resulting knowledge graphs can be easily queried and visualized to understand the changes of features in specific regions over time.
+A framework for automatic conversion of vector data - extracted from USGS historical topographic map archives - into linked and publishable spatio-temporal data as `RDF`. The resulting knowledge graphs can be easily queried and visualized to understand the changes of features in specific regions over time.
 
 The process runs in three steps which can be executed separately (see the following sections):
 1. __Automatic geometric feature partitioning__
@@ -153,6 +153,36 @@ For example:
 python ui/main.py -s http://localhost:3030/linkedmaps/query
 ```
 then navigate to `http://localhost:5000/`
+
+------------------
+
+### Data
+
+Our data is licensed under [CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
+The data files are organized as follows:
+```
+.
+└── data
+    ├── railroads
+    │  ├── ca
+    │  │   ├── [1950c|1954c|1958c|1962c|1984c|1988c|2001c].shp/shx/prj/qpj/dbf # shapefiles describing railroad networks from different points in time pertaining to a region in Bray, California
+    │  │   └── linked_maps.railroads.ca.ttl # RDF data for railroad networks in Bray, California
+    │  └── co
+    │      ├── [1942|1950|1957|1965].shp/shx/prj/qpj/dbf # shapefiles describing railroad networks from different points in time pertaining to a region in Louisville, Colorado
+    │      └── linked_maps.railroads.co.ttl # RDF data for railroad networks in Louisville, Colorado
+    └── wetlands
+       ├── ca
+       │   ├── [1961|1990|1993|2018].shp/shx/prj/qpj/dbf # shapefiles describing wetland areas from different points in time pertaining to a region in Bieber, California
+       │   └── linked_maps.wetlands.ca.ttl # RDF data for wetland areas in Bieber, California
+       ├── fl
+       │   ├── [1956|1987|2020].shp/shx/prj/qpj/dbf # shapefiles describing wetland areas from different points in time pertaining to a region in Palm Beach, Florida
+       │   └── linked_maps.wetlands.fl.ttl # RDF data for wetland areas in Palm Beach, Florida
+       └── tx
+           ├── [1959|1995|2020].shp/shx/prj/qpj/dbf # shapefiles describing wetland areas from different points in time pertaining to a region in Duncanville, Texas
+           └── linked_maps.wetlands.tx.ttl # RDF data for wetland areas in Duncanville, Texas
+```
+
+The resulting knowledge graph (all `ttl` files combined) is published and available as linked data [here](https://linked-maps.isi.edu/) (with compliant IRI dereferenciation), along with a designated SPARQL endpoint [here](https://linked-maps.isi.edu/sparql).
 
 ------------------
 
