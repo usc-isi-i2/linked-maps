@@ -190,12 +190,12 @@ The resulting knowledge graph (all `ttl` files combined) is published and availa
 
 If you would like to cite this work in a paper or a presentation, the following is recommended (`BibTeX` entry):
 ```
-@inproceedings{shbita2020building,
-  title={Building Linked Spatio-Temporal Data from Vectorized Historical Maps},
+@article{shbitabuilding,
+  title={Building spatio-temporal knowledge graphs from vectorized topographic historical maps},
   author={Shbita, Basel and Knoblock, Craig A and Duan, Weiwei and Chiang, Yao-Yi and Uhl, Johannes H and Leyk, Stefan},
-  booktitle={European Semantic Web Conference},
-  pages={409--426},
-  year={2020},
-  organization={Springer}
+  journal={Semantic Web},
+  number={Preprint},
+  pages={1--23},
+  publisher={IOS Press}
 }
 ```
